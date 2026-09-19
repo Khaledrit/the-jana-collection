@@ -2,10 +2,29 @@ import { destinations, services, properties, siteImages, ui } from './content.js
 import { OWNER_CONFIG } from './config.js';
 
 const app = document.querySelector('#app');
-const isArabic = () => location.pathname === '/ar' || location.pathname.startsWith('/ar/');
+const BASE = (() => {
+  const configured = document.querySelector('meta[name="app-base"]')?.content.replace(/\/$/, '') || '';
+  return configured && location.pathname.startsWith(configured) ? configured : '';
+})();
+const pathWithoutBase = () => {
+  let path = location.pathname;
+  if (BASE && path.startsWith(BASE)) path = path.slice(BASE.length) || '/';
+  return path;
+};
+const isArabic = () => {
+  const path = pathWithoutBase();
+  return path === '/ar' || path.startsWith('/ar/');
+};
 const lang = () => isArabic() ? 'ar' : 'en';
-const rootPath = (path = '/') => isArabic() ? `/ar${path === '/' ? '' : path}` : path;
-const stripLang = () => isArabic() ? (location.pathname.slice(3) || '/') : location.pathname;
+const rootPath = (path = '/') => {
+  const localized = isArabic() ? `/ar${path === '/' ? '' : path}` : path;
+  return `${BASE}${localized}`;
+};
+const stripLang = () => {
+  let path = pathWithoutBase();
+  if (isArabic()) path = path.slice(3) || '/';
+  return path;
+};
 const whatsappHref = (context = '') => `https://wa.me/${OWNER_CONFIG.whatsappNumber.replace(/\D/g,'')}${context ? `?text=${encodeURIComponent(`Hello Jana Travel, I would like to enquire about ${context}.`)}` : ''}`;
 const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const pick = (en, ar) => isArabic() ? ar : en;
