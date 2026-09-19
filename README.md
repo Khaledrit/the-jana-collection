@@ -27,7 +27,7 @@ python3 scripts/build.py
 ## Content and routes
 
 - Editable destination, service and property records: `content.js`
-- Components, router, search and enquiry logic: `app.js`
+- Components, router and WhatsApp contact logic: `app.js`
 - Visual system and responsive behaviour: `styles.css`
 - Official source ledger and image policy: `SOURCES.md`
 - Cloudflare Pages-style fallback: `_redirects`
@@ -36,8 +36,7 @@ python3 scripts/build.py
 
 Edit `config.js`:
 
-- `whatsappNumber`: a verified business WhatsApp number in international format, digits only or with `+`. While blank, the floating contact control opens the enquiry form.
-- `enquiryEndpoint`: a verified form/API endpoint that accepts JSON. While blank, submission clearly states: “Demo only — your enquiry has not been sent.”
+- `whatsappNumber`: the verified business WhatsApp number in international format. All journey enquiry actions open a WhatsApp conversation with this number.
 - `contactEmail`, `contactPhone`, `socialLinks`: intentionally blank and not shown until the owner supplies verified details.
 
 Also required:

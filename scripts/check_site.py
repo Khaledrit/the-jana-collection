@@ -13,7 +13,8 @@ app = (root/'app.js').read_text()
 names = ['Maldives','Seychelles','Mauritius','Greece','Italy','France','Switzerland','Turkey','Dubai','Thailand','Bali','Europe','Beyond','Waldorf Astoria Maldives Ithaafushi','Cheval Blanc Randheli','JOALI Maldives','One&Only Reethi Rah']
 absent = [n for n in names if n not in content]
 assert not absent, f'Missing content entries: {absent}'
-assert 'Demo only — your enquiry has not been sent.' in app
+assert 'whatsappHref' in app and 'https://wa.me/' in app
+assert 'searchOpen' not in app and 'siteSearch' not in app
 config = (root/'config.js').read_text()
 match = re.search(r'whatsappNumber:\s*"([^"]*)"', config)
 assert match, 'WhatsApp configuration is missing'
