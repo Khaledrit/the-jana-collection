@@ -14,5 +14,9 @@ names = ['Maldives','Seychelles','Mauritius','Greece','Italy','France','Switzerl
 absent = [n for n in names if n not in content]
 assert not absent, f'Missing content entries: {absent}'
 assert 'Demo only — your enquiry has not been sent.' in app
-assert 'whatsappNumber: ""' in (root/'config.js').read_text()
-print(f'PASS: {len(names)} required names found; core files and safe form/contact defaults verified.')
+config = (root/'config.js').read_text()
+match = re.search(r'whatsappNumber:\s*"([^"]*)"', config)
+assert match, 'WhatsApp configuration is missing'
+whatsapp = match.group(1)
+assert not whatsapp or re.fullmatch(r'\+[1-9]\d{7,14}', whatsapp), 'WhatsApp number must be blank or use international format'
+print(f'PASS: {len(names)} required names found; core files and contact configuration verified.')

@@ -1,5 +1,5 @@
 export const OWNER_CONFIG = {
-  whatsappNumber: "",
+  whatsappNumber: "+971501771927",
   enquiryEndpoint: "",
   contactEmail: "",
   contactPhone: "",
