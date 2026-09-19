@@ -18,6 +18,12 @@ Run the project checks with:
 python3 scripts/check_site.py
 ```
 
+Create the Cloudflare Worker-compatible deployment output with:
+
+```bash
+python3 scripts/build.py
+```
+
 ## Content and routes
 
 - Editable destination, service and property records: `content.js`

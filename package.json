@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "python3 scripts/serve.py",
+    "build": "python3 scripts/build.py",
     "check": "python3 scripts/check_site.py"
   }
 }

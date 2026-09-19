@@ -2,5 +2,6 @@
 __pycache__/
 *.pyc
 .env
+dist/
 public/screenshot.jpeg
 WhatsApp Image *.jpeg
