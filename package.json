@@ -1,0 +1,10 @@
+{
+  "name": "jana-travel-luxury-collection",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 scripts/serve.py",
+    "check": "python3 scripts/check_site.py"
+  }
+}
