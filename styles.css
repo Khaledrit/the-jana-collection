@@ -30,3 +30,25 @@
 @media(max-width:1100px){.nav{display:none}.header-inner{grid-template-columns:1fr auto}.head-actions .header-cta{display:none}.menu-btn{display:block}.intro-grid{grid-template-columns:1fr 1.25fr}.handwritten{grid-column:1/-1}.service-grid{grid-template-columns:1fr 1fr}.overview-grid{grid-template-columns:1fr 1fr}.destination-layout{grid-template-columns:1fr}.feature-card{min-height:550px}.property-row{grid-auto-columns:calc((100% - 36px)/3)}.principles{grid-template-columns:repeat(3,1fr)}.head-top{right:12vw}}
 @media(max-width:760px){.container{width:min(100% - 34px,680px)}.section{padding:68px 0}.section-title{display:block}.section-title p{margin-top:14px}.site-header{position:absolute}.header-inner{height:75px;padding-bottom:16px}.brand{font-size:27px}.head-top{display:none}.hero{min-height:720px;background-position:61% center}.hero:before{background:linear-gradient(90deg,rgba(0,37,45,.94),rgba(0,37,45,.35)),linear-gradient(0deg,rgba(0,31,39,.55),transparent)}.hero-content{width:100%;padding-top:90px}.hero h1{font-size:58px;max-width:390px}.hero p{font-size:14px;max-width:420px}.scroll-cue{display:none}.intro-grid{grid-template-columns:1fr;gap:45px}.intro-photo{order:-1}.service-grid,.small-grid,.overview-grid{grid-template-columns:1fr}.image-card,.small-grid .image-card{min-height:420px}.feature-card{min-height:520px}.destination-links{align-items:flex-start;flex-direction:column}.property-row{grid-auto-columns:84%}.property-card img{height:260px}.footer-grid{grid-template-columns:1fr;gap:45px}.footer-bottom{align-items:flex-start;flex-direction:column;gap:15px}.mobile-drawer{display:block;position:fixed;inset:0;z-index:90;background:var(--dark);color:white;padding:30px 26px;transform:translateX(100%);transition:.3s}.mobile-drawer.open{transform:translateX(0)}[dir="rtl"] .mobile-drawer{transform:translateX(-100%)}[dir="rtl"] .mobile-drawer.open{transform:translateX(0)}.drawer-top{display:flex;justify-content:space-between;align-items:center}.drawer-links{display:flex;flex-direction:column;margin-top:55px}.drawer-links a{font:400 36px/1.6 var(--serif);border-bottom:1px solid rgba(255,255,255,.12)}.drawer-bottom{margin-top:35px;display:flex;justify-content:space-between;align-items:center}.page-hero{min-height:500px;padding-bottom:50px}.page-hero h1{font-size:60px}.lead-grid,.content-grid,.property-meta,.enquiry-wrap{grid-template-columns:1fr;gap:30px}.info-columns{grid-template-columns:1fr;gap:45px}.gallery{grid-template-columns:1fr 1fr}.gallery img{height:240px}.gallery img:first-child{grid-column:1/-1}.principles{grid-template-columns:1fr}.field-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.enquiry-card{padding:25px}.contact-float{width:50px;height:50px;bottom:16px;right:16px}.editorial{padding:70px 0}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Mobile containment and intentional card rails. The page stays fixed; only these tracks scroll. */
+html,body,#app{max-width:100%;overflow-x:clip}
+main,header,footer,section,.container,.hero-content,.page-hero .container{min-width:0;max-width:100%}
+img,svg,video,canvas{max-width:100%}
+
+@media(max-width:760px){
+  html,body,#app{width:100%;overflow-x:hidden}
+  .container{width:calc(100% - 34px);min-width:0}
+  .section-title,.section-title h2,.section-title p{min-width:0;max-width:100%}
+  .section-title h2,.section-title p{overflow-wrap:anywhere}
+  .service-grid,.destination-layout{display:flex;gap:16px;width:100%;min-width:0;max-width:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .service-grid::-webkit-scrollbar,.destination-layout::-webkit-scrollbar{display:none}
+  .service-grid .image-card,.destination-layout>.feature-card,.destination-layout .small-grid .image-card{flex:0 0 88%;max-width:88%;min-width:0;scroll-snap-align:start}
+  .service-grid .image-card{min-height:420px}
+  .destination-layout>.feature-card,.destination-layout .small-grid .image-card{min-height:520px}
+  .destination-layout .small-grid{display:contents}
+  .property-row{width:100%;min-width:0;max-width:100%}
+  .carousel-btn.prev{left:8px}
+  .carousel-btn.next{right:8px}
+  .hero-content{min-width:0}
+}
