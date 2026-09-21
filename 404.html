@@ -10,12 +10,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&family=Italiana&family=La+Belle+Aurore&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
+    <script>
+      (function () {
+        var configured = (document.querySelector('meta[name="app-base"]')?.content || '').replace(/\/$/, '');
+        var base = configured && location.pathname.indexOf(configured) === 0 ? configured : '';
+        document.write('<link rel="stylesheet" href="' + base + '/styles.css" />');
+        document.write('<script type="module" src="' + base + '/app.js"><\/script>');
+      })();
+    </script>
     <title>Jana Travel — Exceptionally Curated</title>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <div id="app"></div>
-    <script type="module" src="app.js"></script>
   </body>
 </html>
