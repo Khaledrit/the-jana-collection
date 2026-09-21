@@ -1,5 +1,11 @@
 export const img = (id, w = 1600) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=84`;
 
+const localAsset = (path) => {
+  const configured = document.querySelector('meta[name="app-base"]')?.content.replace(/\/$/, '') || '';
+  const base = configured && location.pathname.startsWith(configured) ? configured : '';
+  return `${base}${path.startsWith('/') ? path : `/${path}`}`;
+};
+
 export const siteImages = {
   hero: img("photo-1507525428034-b723cf961d3e", 2200),
   story: img("photo-1600607687939-ce8a6c25118c", 1400),
@@ -7,7 +13,7 @@ export const siteImages = {
   islands: img("photo-1510414842594-a61c69b5ae57"),
   villas: img("photo-1600607687920-4e2a09cf159d"),
   aviation: img("photo-1540962351504-03099e0a754b"),
-  yachts: img("photo-1544551763-46a013bb70d5"),
+  yachts: localAsset('/images/private-yacht-2026-v2.jpg'),
   maldives: img("photo-1514282401047-d79a71a590e8"),
   seychelles: img("photo-1589979481223-deb893043163"),
   mauritius: img("photo-1590080875515-8a3a8dc5735e"),
