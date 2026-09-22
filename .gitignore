@@ -2,6 +2,11 @@
 __pycache__/
 *.pyc
 .env
+.env.*
 dist/
 public/screenshot.jpeg
 WhatsApp Image *.jpeg
+studio/node_modules/
+studio/.sanity/
+studio/dist/
+*.pem

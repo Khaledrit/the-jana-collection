@@ -15,9 +15,10 @@ server.mkdir(parents=True)
 
 for name in ('index.html', 'styles.css', 'app.js', 'content.js', 'config.js', '_redirects'):
     shutil.copy2(root / name, client / name)
-images = root / 'images'
-if images.exists():
-    shutil.copytree(images, client / 'images')
+for folder in ('images', 'data', 'components'):
+    src = root / folder
+    if src.exists():
+        shutil.copytree(src, client / folder)
 shutil.copy2(root / 'server' / 'index.js', server / 'index.js')
 shutil.copy2(root / '.openai' / 'hosting.json', dist / '.openai' / 'hosting.json')
 print(f'Built {dist}')
