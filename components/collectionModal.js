@@ -57,6 +57,9 @@ export function renderCollectionModalContent(item, ctx, kind) {
       <div class="eyebrow">${pick(copy.eyebrowEn, copy.eyebrowAr)}</div>
       <h2 id="propertyModalTitle">${esc(item.name)}</h2>
       ${item.place ? `<p class="property-modal__place">${esc(item.place)}</p>` : ''}
+      ${kind === 'yacht' && item.locationLabel
+        ? `<p class="property-modal__place">${esc(item.locationLabel)}</p>`
+        : ''}
 
       ${stats.length ? `<div class="property-modal__stats">
         ${stats.map(([value, label]) => `<div><strong>${esc(value)}</strong><span>${esc(label)}</span></div>`).join('')}
@@ -84,10 +87,13 @@ function buildStats(item, kind, pick) {
   }
   if (kind === 'yacht') {
     return [
-      item.cabins != null ? [`${item.cabins}`, pick('Cabins', 'الكبائن')] : null,
+      item.lengthLabel ? [item.lengthLabel, pick('Length', 'الطول')] : null,
       item.maxGuests != null ? [`${item.maxGuests}`, pick('Guests', 'الضيوف')] : null,
+      item.cabins != null ? [`${item.cabins}`, pick('Cabins', 'الكبائن')] : null,
       item.crew != null ? [`${item.crew}`, pick('Crew', 'الطاقم')] : null,
-      item.lengthLabel ? [item.lengthLabel, pick('Length', 'الطول')] : null
+      item.marina ? [item.marina, pick('Marina', 'المرسى')] : null,
+      item.priceLabel ? [item.priceLabel, pick('Rate', 'السعر')] : null,
+      item.minimumBookingLabel ? [item.minimumBookingLabel, pick('Minimum', 'الحد الأدنى')] : null
     ].filter(Boolean);
   }
   return [

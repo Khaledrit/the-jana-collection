@@ -14,6 +14,7 @@ export const yacht = defineType({
     {name: 'basics', title: 'Basics', default: true},
     {name: 'media', title: 'Media'},
     {name: 'vessel', title: 'Vessel'},
+    {name: 'pricing', title: 'Pricing'},
     {name: 'details', title: 'Details'},
     {name: 'seo', title: 'SEO'},
   ],
@@ -64,9 +65,9 @@ export const yacht = defineType({
       title: 'Hero image',
       type: 'image',
       group: 'media',
-      description: 'Primary image used on the yacht card and presentation.',
+      description:
+        'Primary image used on the yacht card and presentation. Optional until licensed imagery is uploaded.',
       options: {hotspot: true},
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'gallery',
@@ -75,6 +76,13 @@ export const yacht = defineType({
       group: 'media',
       description: 'Additional images shown in the gallery. Drag to reorder.',
       of: [{type: 'image', options: {hotspot: true}}],
+    }),
+    defineField({
+      name: 'builder',
+      title: 'Builder / manufacturer',
+      type: 'string',
+      group: 'vessel',
+      description: 'For example Azimut, Sunseeker, Benetti.',
     }),
     defineField({
       name: 'yachtType',
@@ -127,11 +135,64 @@ export const yacht = defineType({
       validation: (Rule) => Rule.min(0).integer(),
     }),
     defineField({
-      name: 'cruisingArea',
-      title: 'Location / cruising area',
+      name: 'marina',
+      title: 'Marina / home berth',
       type: 'string',
       group: 'vessel',
-      description: 'Primary region or cruising area.',
+      description: 'Home marina or berth location, for example Dubai Harbour.',
+    }),
+    defineField({
+      name: 'cruisingArea',
+      title: 'Cruising area',
+      type: 'string',
+      group: 'vessel',
+      description: 'Primary cruising region, for example Dubai coastline.',
+    }),
+    defineField({
+      name: 'startingPrice',
+      title: 'Starting price',
+      type: 'number',
+      group: 'pricing',
+      description: 'Numeric rate only. Leave blank for POA / on request.',
+      validation: (Rule) => Rule.min(0),
+    }),
+    defineField({
+      name: 'currency',
+      title: 'Currency',
+      type: 'string',
+      group: 'pricing',
+      options: {
+        list: [
+          {title: 'AED — UAE Dirham', value: 'AED'},
+          {title: 'EUR — Euro', value: 'EUR'},
+          {title: 'USD — US Dollar', value: 'USD'},
+          {title: 'GBP — British Pound', value: 'GBP'},
+        ],
+        layout: 'dropdown',
+      },
+    }),
+    defineField({
+      name: 'pricingPeriod',
+      title: 'Pricing period',
+      type: 'string',
+      group: 'pricing',
+      description: 'How the starting price is presented.',
+      options: {
+        list: [
+          {title: 'Per Hour', value: 'hour'},
+          {title: 'Per Day', value: 'day'},
+          {title: 'On Request', value: 'on request'},
+        ],
+        layout: 'dropdown',
+      },
+    }),
+    defineField({
+      name: 'minimumBookingHours',
+      title: 'Minimum booking (hours)',
+      type: 'number',
+      group: 'pricing',
+      description: 'Minimum charter duration in hours. Use 24 for overnight minima where applicable.',
+      validation: (Rule) => Rule.min(0).integer(),
     }),
     defineField({
       name: 'shortDescription',
@@ -198,14 +259,15 @@ export const yacht = defineType({
     select: {
       title: 'name',
       media: 'heroImage',
+      builder: 'builder',
       yachtType: 'yachtType',
       cabins: 'cabins',
       maxGuests: 'maxGuests',
       featured: 'featured',
     },
-    prepare({title, media, yachtType, cabins, maxGuests, featured}) {
+    prepare({title, media, builder, yachtType, cabins, maxGuests, featured}) {
       const parts = [
-        yachtType,
+        builder || yachtType,
         cabins != null ? `${cabins} Cabins` : null,
         maxGuests != null ? `${maxGuests} Guests` : null,
       ].filter(Boolean)

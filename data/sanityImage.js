@@ -32,6 +32,27 @@ export function urlForImage(source, { width, height, quality = 84 } = {}) {
   }
 }
 
+/**
+ * CSS object-position from Sanity hotspot (0–1), or centered when absent.
+ * @param {object|null|undefined} source
+ * @returns {string}
+ */
+export function objectPositionFromHotspot(source) {
+  const hotspot = source && typeof source === 'object' ? source.hotspot : null;
+  if (
+    hotspot &&
+    typeof hotspot.x === 'number' &&
+    typeof hotspot.y === 'number' &&
+    Number.isFinite(hotspot.x) &&
+    Number.isFinite(hotspot.y)
+  ) {
+    const x = Math.min(1, Math.max(0, hotspot.x)) * 100;
+    const y = Math.min(1, Math.max(0, hotspot.y)) * 100;
+    return `${x}% ${y}%`;
+  }
+  return 'center center';
+}
+
 function withParams(rawUrl, { width, height, quality }) {
   try {
     const url = new URL(rawUrl);
