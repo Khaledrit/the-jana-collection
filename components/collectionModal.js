@@ -31,13 +31,17 @@ export function renderCollectionModalContent(item, ctx, kind) {
   if (item.heroImage && !gallery.includes(item.heroImage)) gallery.unshift(item.heroImage);
   const stats = buildStats(item, kind, pick);
   const columns = buildColumns(item, kind, pick, esc);
+  const objectPosition = kind === 'yacht' && item.heroObjectPosition
+    ? item.heroObjectPosition
+    : '';
+  const imgStyle = objectPosition ? ` style="object-position:${esc(objectPosition)}"` : '';
 
   const galleryBlock = gallery.length
     ? `<div class="property-modal__gallery" data-gallery>
       <div class="property-modal__slides">
         ${gallery.map((src, index) => `
           <figure class="property-modal__slide${index === 0 ? ' is-active' : ''}" data-slide-index="${index}">
-            <img src="${esc(src)}" alt="${esc(item.name)} — ${pick('image', 'صورة')} ${index + 1}" width="1400" height="900">
+            <img src="${esc(src)}" alt="${esc(item.name)} — ${pick('image', 'صورة')} ${index + 1}" width="1400" height="900"${imgStyle}>
           </figure>`).join('')}
       </div>
       ${gallery.length > 1 ? `
@@ -46,7 +50,7 @@ export function renderCollectionModalContent(item, ctx, kind) {
         <div class="property-modal__count" data-gallery-count>1 / ${gallery.length}</div>
       ` : ''}
     </div>`
-    : `<div class="property-modal__gallery property-modal__gallery--empty" aria-hidden="true">
+    : `<div class="property-modal__gallery property-modal__gallery--empty${kind === 'yacht' ? ' property-modal__gallery--landscape' : ''}" aria-hidden="true">
       <div class="property-modal__placeholder"><span>${esc(item.name)}</span></div>
     </div>`;
 

@@ -72,6 +72,8 @@ export function mapSanityPrivateJet(doc) {
     aircraftType: doc.aircraftType || '',
     manufacturer: doc.manufacturer || '',
     passengerCapacity: doc.passengerCapacity ?? null,
+    range: doc.range ?? null,
+    rangeUnit: doc.rangeUnit || '',
     rangeLabel,
     homeBase: doc.homeBase || '',
     shortIntro: doc.shortDescription || '',

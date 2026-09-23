@@ -17,6 +17,21 @@ import {
   renderFilterEmptyState,
   formatFilterTriggerLabel
 } from './components/propertyFilters.js';
+import {
+  createEmptyJetFilters,
+  createEmptyYachtFilters,
+  getJetFilterOptions,
+  getYachtFilterOptions,
+  filterJets,
+  filterYachts,
+  jetFiltersAreActive,
+  yachtFiltersAreActive,
+  renderJetFilters,
+  renderYachtFilters,
+  renderCollectionFilterEmptyState,
+  formatJetFilterTriggerLabel,
+  formatYachtFilterTriggerLabel
+} from './components/collectionFilters.js';
 
 const app = document.querySelector('#app');
 const BASE = (() => {
@@ -75,6 +90,10 @@ let villaFilterKeyHandler = null;
 let jetItems = [];
 let yachtItems = [];
 let experienceItems = [];
+let jetFilterState = createEmptyJetFilters();
+let yachtFilterState = createEmptyYachtFilters();
+let collectionFilterOutsideHandler = null;
+let collectionFilterKeyHandler = null;
 
 function navigate(path){ history.pushState({},'',path); window.scrollTo({top:0,behavior:'instant'}); render(); }
 document.addEventListener('click', e => {
@@ -158,40 +177,61 @@ async function renderVillaDiscoverySection(){
 async function renderServiceCollectionSection(kind){
  const helpers = propertyHelpers();
  let items = [];
- let titleEn; let titleAr; let leadEn; let leadAr; let emptyEn; let emptyAr;
+ let titleEn = 'Collection';
+ let titleAr = 'المجموعة';
+ let leadEn = 'A selective starting point. Select any card to open a fuller presentation without leaving this page.';
+ let leadAr = 'نقطة بداية انتقائية. اختاروا أي بطاقة لفتح عرض أوضح دون مغادرة هذه الصفحة.';
+ let emptyEn = 'Published items will appear here when available.';
+ let emptyAr = 'ستظهر العناصر المنشورة هنا عند توافرها.';
  try {
   if(kind === 'jet'){
    jetItems = await getCollectionPrivateJets();
+   jetFilterState = createEmptyJetFilters();
    items = jetItems;
    titleEn = 'Aircraft to consider'; titleAr = 'طائرات للاختيار';
-   leadEn = 'A selective starting point. Select any card to open a fuller presentation without leaving this page.';
-   leadAr = 'نقطة بداية انتقائية. اختاروا أي بطاقة لفتح عرض أوضح دون مغادرة هذه الصفحة.';
    emptyEn = 'Published private jets will appear here when available.';
    emptyAr = 'ستظهر الطائرات الخاصة المنشورة هنا عند توافرها.';
   } else if(kind === 'yacht'){
    yachtItems = await getCollectionYachts();
+   yachtFilterState = createEmptyYachtFilters();
    items = yachtItems;
    titleEn = 'Yachts to consider'; titleAr = 'يخوت للاختيار';
-   leadEn = 'A selective starting point. Select any card to open a fuller presentation without leaving this page.';
-   leadAr = 'نقطة بداية انتقائية. اختاروا أي بطاقة لفتح عرض أوضح دون مغادرة هذه الصفحة.';
    emptyEn = 'Published yachts will appear here when available.';
    emptyAr = 'ستظهر اليخوت المنشورة هنا عند توافرها.';
   } else {
    experienceItems = await getCollectionExperiences();
    items = experienceItems;
    titleEn = 'Experiences to consider'; titleAr = 'تجارب للاختيار';
-   leadEn = 'A selective starting point. Select any card to open a fuller presentation without leaving this page.';
-   leadAr = 'نقطة بداية انتقائية. اختاروا أي بطاقة لفتح عرض أوضح دون مغادرة هذه الصفحة.';
    emptyEn = 'Published experiences will appear here when available.';
    emptyAr = 'ستظهر التجارب المنشورة هنا عند توافرها.';
   }
  } catch (error) {
   console.warn(`[collection] Failed to load ${kind} collection.`, error);
   items = [];
+  if(kind === 'jet'){
+   titleEn = 'Aircraft to consider'; titleAr = 'طائرات للاختيار';
+   emptyEn = 'Published private jets will appear here when available.';
+   emptyAr = 'ستظهر الطائرات الخاصة المنشورة هنا عند توافرها.';
+  } else if(kind === 'yacht'){
+   titleEn = 'Yachts to consider'; titleAr = 'يخوت للاختيار';
+   emptyEn = 'Published yachts will appear here when available.';
+   emptyAr = 'ستظهر اليخوت المنشورة هنا عند توافرها.';
+  } else {
+   titleEn = 'Experiences to consider'; titleAr = 'تجارب للاختيار';
+   emptyEn = 'Published experiences will appear here when available.';
+   emptyAr = 'ستظهر التجارب المنشورة هنا عند توافرها.';
+  }
  }
 
+ const filtersMarkup = kind === 'jet' && items.length
+   ? renderJetFilters(getJetFilterOptions(items), jetFilterState, helpers)
+   : kind === 'yacht' && items.length
+     ? renderYachtFilters(getYachtFilterOptions(items), yachtFilterState, helpers)
+     : '';
+
  const grid = items.length
-   ? `<div class="jana-collection-grid" data-collection-grid="${kind}">${renderCollectionCardList(items, helpers, kind)}</div>`
+   ? `<div class="jana-collection-grid" data-collection-grid="${kind}">${renderCollectionCardList(items, helpers, kind)}</div>
+      <div data-collection-filter-empty="${kind}" hidden>${renderCollectionFilterEmptyState(kind, helpers)}</div>`
    : `<div class="villa-filters__empty" data-collection-empty="${kind}"><p>${pick(emptyEn, emptyAr)}</p></div>`;
 
  return `<section class="section villa-discovery" id="${kind}-discovery">
@@ -201,6 +241,7 @@ async function renderServiceCollectionSection(kind){
       <p>${pick('A selective starting point','نقطة بداية انتقائية')}</p>
     </div>
     <p class="villa-discovery__lead">${pick(leadEn, leadAr)}</p>
+    ${filtersMarkup}
     ${grid}
   </div>
 </section>`;
@@ -395,10 +436,234 @@ function bindVillaFilterControls(){
  if(villaFilterKeyHandler) document.removeEventListener('keydown', villaFilterKeyHandler);
  villaFilterKeyHandler = e => {
   if(e.key !== 'Escape') return;
-  if(!document.querySelector('[data-filter-sheet]')?.hidden) setVillaFilterSheet(false);
+  if(!document.querySelector('[data-villa-filters] [data-filter-sheet]')?.hidden) setVillaFilterSheet(false);
   else closeVillaFilterMenus();
  };
  document.addEventListener('keydown', villaFilterKeyHandler);
+}
+
+const JET_NUMERIC_FILTERS = new Set(['passengers', 'range']);
+const YACHT_NUMERIC_FILTERS = new Set(['length', 'guests', 'cabins']);
+
+function refreshJetCollection({ rebuildFilters = true, keepMenu = '' } = {}){
+ refreshServiceCollection('jet', {
+  items: jetItems,
+  filters: jetFilterState,
+  getOptions: getJetFilterOptions,
+  filterFn: filterJets,
+  renderFilters: renderJetFilters,
+  areActive: jetFiltersAreActive,
+  formatLabel: formatJetFilterTriggerLabel,
+  createEmpty: createEmptyJetFilters,
+  rebuildFilters,
+  keepMenu
+ });
+}
+
+function refreshYachtCollection({ rebuildFilters = true, keepMenu = '' } = {}){
+ refreshServiceCollection('yacht', {
+  items: yachtItems,
+  filters: yachtFilterState,
+  getOptions: getYachtFilterOptions,
+  filterFn: filterYachts,
+  renderFilters: renderYachtFilters,
+  areActive: yachtFiltersAreActive,
+  formatLabel: formatYachtFilterTriggerLabel,
+  createEmpty: createEmptyYachtFilters,
+  rebuildFilters,
+  keepMenu
+ });
+}
+
+function refreshServiceCollection(kind, cfg){
+ const grid = document.querySelector(`[data-collection-grid="${kind}"]`);
+ const empty = document.querySelector(`[data-collection-filter-empty="${kind}"]`);
+ if(!grid) return;
+ const helpers = propertyHelpers();
+ const options = cfg.getOptions(cfg.items);
+ const filtered = cfg.filterFn(cfg.items, cfg.filters);
+
+ if(cfg.rebuildFilters){
+  const root = document.querySelector(`[data-collection-filters="${kind}"]`);
+  const sheetOpen = root && !root.querySelector('[data-filter-sheet]')?.hidden;
+  const openMenu = cfg.keepMenu || root?.querySelector('.villa-filter.is-open')?.getAttribute('data-filter-group') || '';
+  if(root){
+   root.outerHTML = cfg.renderFilters(options, cfg.filters, helpers);
+   if(sheetOpen){
+    const sheet = document.querySelector(`[data-collection-filters="${kind}"] [data-filter-sheet]`);
+    if(sheet){
+     sheet.hidden = false;
+     sheet.setAttribute('aria-hidden','false');
+     document.body.classList.add('filter-sheet-open');
+    }
+   }
+  }
+  bindCollectionFilterControls(kind);
+  if(openMenu){
+   const group = document.querySelector(`[data-collection-filters="${kind}"] .villa-filters__desktop [data-filter-group="${openMenu}"]`);
+   const menu = group?.querySelector('[data-filter-menu]');
+   const trigger = group?.querySelector('[data-filter-trigger]');
+   if(menu && trigger){
+    menu.hidden = false;
+    trigger.setAttribute('aria-expanded','true');
+    group.classList.add('is-open');
+   }
+  }
+ } else {
+  syncCollectionFilterChrome(kind, cfg);
+ }
+
+ grid.innerHTML = filtered.length ? renderCollectionCardList(filtered, helpers, kind) : '';
+ if(empty){
+  empty.hidden = filtered.length > 0;
+  if(!filtered.length){
+   empty.innerHTML = renderCollectionFilterEmptyState(kind, helpers);
+   empty.querySelectorAll('[data-filter-clear]').forEach(btn => {
+    btn.addEventListener('click', () => {
+     if(kind === 'jet') jetFilterState = createEmptyJetFilters();
+     else yachtFilterState = createEmptyYachtFilters();
+     setCollectionFilterSheet(kind, false);
+     if(kind === 'jet') refreshJetCollection();
+     else refreshYachtCollection();
+    });
+   });
+  }
+ }
+ bindCollectionCards(kind);
+}
+
+function syncCollectionFilterChrome(kind, cfg){
+ const root = document.querySelector(`[data-collection-filters="${kind}"]`);
+ if(!root) return;
+ const active = cfg.areActive(cfg.filters);
+ root.querySelectorAll('[data-filter-clear]').forEach(btn => {
+  if(btn.closest('[data-collection-filter-empty]')) return;
+  btn.hidden = !active;
+  btn.classList.toggle('is-visible', active);
+ });
+ const mobileTrigger = root.querySelector('[data-filter-sheet-open]');
+ if(mobileTrigger){
+  const count = Object.values(cfg.filters).filter(v => v != null && v !== '').length;
+  mobileTrigger.innerHTML = `${root.querySelector('.villa-filters__icon')?.outerHTML || ''}<span>${pick('Filters', 'تصفية')}</span>${count ? `<span class="villa-filters__mobile-count">${count}</span>` : ''}`;
+ }
+ root.querySelectorAll('.villa-filters__desktop [data-filter-group]').forEach(group => {
+  const key = group.getAttribute('data-filter-group');
+  const value = cfg.filters[key];
+  const on = value != null && value !== '';
+  group.classList.toggle('is-active', on);
+  const name = group.querySelector('.villa-filter__name');
+  if(name) name.textContent = cfg.formatLabel(key, cfg.filters, pick);
+ });
+}
+
+function closeCollectionFilterMenus(kind){
+ const root = document.querySelector(`[data-collection-filters="${kind}"]`);
+ if(!root) return;
+ root.querySelectorAll('[data-filter-menu]').forEach(menu => { menu.hidden = true; });
+ root.querySelectorAll('[data-filter-trigger]').forEach(btn => {
+  btn.setAttribute('aria-expanded','false');
+  btn.closest('.villa-filter')?.classList.remove('is-open');
+ });
+}
+
+function setCollectionFilterSheet(kind, open){
+ const sheet = document.querySelector(`[data-collection-filters="${kind}"] [data-filter-sheet]`);
+ if(!sheet) return;
+ sheet.hidden = !open;
+ sheet.setAttribute('aria-hidden', String(!open));
+ document.body.classList.toggle('filter-sheet-open', open);
+ if(!open) closeCollectionFilterMenus(kind);
+}
+
+function bindCollectionCards(kind){
+ document.querySelectorAll(`[data-collection-grid="${kind}"] [data-collection-slug]`).forEach(btn => {
+  btn.addEventListener('click', () => openCollectionModal(
+   btn.getAttribute('data-collection-kind'),
+   btn.getAttribute('data-collection-slug'),
+   btn
+  ));
+ });
+}
+
+function bindCollectionFilterControls(kind){
+ const root = document.querySelector(`[data-collection-filters="${kind}"]`);
+ if(!root) return;
+
+ const numericKeys = kind === 'jet' ? JET_NUMERIC_FILTERS : YACHT_NUMERIC_FILTERS;
+ const refresh = () => kind === 'jet' ? refreshJetCollection() : refreshYachtCollection();
+ const clearAll = () => {
+  if(kind === 'jet') jetFilterState = createEmptyJetFilters();
+  else yachtFilterState = createEmptyYachtFilters();
+  setCollectionFilterSheet(kind, false);
+  refresh();
+ };
+
+ root.querySelectorAll('[data-filter-trigger]').forEach(trigger => {
+  trigger.addEventListener('click', e => {
+   e.stopPropagation();
+   const group = trigger.closest('.villa-filter');
+   const menu = group?.querySelector('[data-filter-menu]');
+   const willOpen = menu?.hidden;
+   closeCollectionFilterMenus(kind);
+   if(willOpen && menu){
+    menu.hidden = false;
+    trigger.setAttribute('aria-expanded','true');
+    group.classList.add('is-open');
+   }
+  });
+ });
+
+ root.querySelectorAll('[data-filter-set]').forEach(btn => {
+  btn.addEventListener('click', () => {
+   const key = btn.getAttribute('data-filter-set');
+   const raw = btn.getAttribute('data-value') ?? '';
+   const state = kind === 'jet' ? jetFilterState : yachtFilterState;
+   if(numericKeys.has(key)) state[key] = raw === '' ? null : Number(raw);
+   else state[key] = raw;
+   refresh();
+  });
+ });
+
+ root.querySelectorAll('[data-filter-clear-one]').forEach(btn => {
+  btn.addEventListener('click', e => {
+   e.preventDefault();
+   e.stopPropagation();
+   const key = btn.getAttribute('data-filter-clear-one');
+   const state = kind === 'jet' ? jetFilterState : yachtFilterState;
+   if(numericKeys.has(key)) state[key] = null;
+   else state[key] = '';
+   refresh();
+  });
+ });
+
+ root.querySelectorAll('[data-filter-clear]').forEach(btn => {
+  btn.addEventListener('click', clearAll);
+ });
+
+ root.querySelector('[data-filter-sheet-open]')?.addEventListener('click', () => setCollectionFilterSheet(kind, true));
+ root.querySelectorAll('[data-filter-sheet-close]').forEach(btn => {
+  btn.addEventListener('click', () => setCollectionFilterSheet(kind, false));
+ });
+
+ if(collectionFilterOutsideHandler) document.removeEventListener('click', collectionFilterOutsideHandler);
+ collectionFilterOutsideHandler = e => {
+  if(!e.target.closest(`[data-collection-filters="${kind}"]`)) closeCollectionFilterMenus(kind);
+ };
+ document.addEventListener('click', collectionFilterOutsideHandler);
+
+ if(collectionFilterKeyHandler) document.removeEventListener('keydown', collectionFilterKeyHandler);
+ collectionFilterKeyHandler = e => {
+  if(e.key !== 'Escape') return;
+  const sheet = document.querySelector(`[data-collection-filters="${kind}"] [data-filter-sheet]`);
+  if(sheet && !sheet.hidden) setCollectionFilterSheet(kind, false);
+  else closeCollectionFilterMenus(kind);
+ };
+ document.addEventListener('keydown', collectionFilterKeyHandler);
+}
+
+function bindActiveCollectionFilters(){
+ if(document.querySelector('[data-collection-filters="jet"]')) bindCollectionFilterControls('jet');
+ if(document.querySelector('[data-collection-filters="yacht"]')) bindCollectionFilterControls('yacht');
 }
 
 function collectionOverview(){return shell(`${pageHero(pick('The Collection','المجموعة'),pick('Places we believe are worth travelling for.','أماكن نؤمن أنها تستحق السفر من أجلها.'),siteImages.property1)}<section class="editorial"><div class="container"><div class="lead-grid"><div class="eyebrow">${pick('Considered selection','اختيار مدروس')}</div><p class="lead">${pick('Four distinctive Maldivian island resorts, presented as a starting point—not an ownership claim, official partnership or guarantee of availability.','أربعة منتجعات مالديفية مميزة كنقطة بداية، دون ادعاء ملكية أو شراكة رسمية أو ضمان للتوافر.')}</p></div><div class="overview-grid" style="margin-top:70px">${properties.map(p=>card(p.title,p.line,p.image,`/collection/${p.slug}`)).join('')}</div></div></section>${cta(brandName())}`)}
@@ -564,10 +829,23 @@ function bind(){
   ));
  });
  bindVillaFilterControls();
+ bindActiveCollectionFilters();
  document.querySelector('#villaFilterEmpty')?.querySelectorAll('[data-filter-clear]').forEach(btn => {
   btn.addEventListener('click', () => {
    villaFilterState = createEmptyFilters();
    refreshVillaCollection();
+  });
+ });
+ document.querySelectorAll('[data-collection-filter-empty] [data-filter-clear]').forEach(btn => {
+  btn.addEventListener('click', () => {
+   const kind = btn.closest('[data-collection-filter-empty]')?.getAttribute('data-collection-filter-empty');
+   if(kind === 'jet'){
+    jetFilterState = createEmptyJetFilters();
+    refreshJetCollection();
+   } else if(kind === 'yacht'){
+    yachtFilterState = createEmptyYachtFilters();
+    refreshYachtCollection();
+   }
   });
  });
 }

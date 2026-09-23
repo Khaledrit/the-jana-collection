@@ -2,8 +2,12 @@
  * GROQ + fetch for published Yacht documents.
  */
 import { sanityClient } from './sanityClient.js';
-import { urlForImage } from './sanityImage.js';
+import { objectPositionFromHotspot, urlForImage } from './sanityImage.js';
 import { mapGallery, sortCollectionItems } from './collectionHelpers.js';
+
+/** Yacht card media matches Private Jet landscape treatment (3:2 CDN crop). */
+const YACHT_CARD_WIDTH = 1200;
+const YACHT_CARD_HEIGHT = 800; // 3:2
 
 export const YACHTS_QUERY = `*[_type == "yacht" && defined(slug.current)] | order(coalesce(displayPriority, 9999) asc, name asc) {
   _id,
@@ -41,12 +45,28 @@ export async function fetchSanityYachts() {
 export function mapSanityYacht(doc) {
   if (!doc?.slug || !doc?.name) return null;
   const media = mapGallery(doc, urlForImage);
+  const cardImage = doc.heroImage
+    ? urlForImage(doc.heroImage, {
+        width: YACHT_CARD_WIDTH,
+        height: YACHT_CARD_HEIGHT,
+        quality: 84
+      })
+    : '';
   const lengthLabel =
     doc.length != null && doc.lengthUnit
       ? `${doc.length} ${doc.lengthUnit}`
       : doc.length != null
         ? String(doc.length)
         : '';
+  const length = doc.length != null ? Number(doc.length) : null;
+  const lengthUnit = doc.lengthUnit || '';
+  /** Normalize to feet for minimum-length filters when unit is metres. */
+  const lengthFt =
+    length == null
+      ? null
+      : lengthUnit === 'm'
+        ? length * 3.28084
+        : length;
 
   const metaParts = [
     lengthLabel || null,
@@ -60,11 +80,17 @@ export function mapSanityYacht(doc) {
     name: doc.name,
     slug: doc.slug,
     ...media,
+    /** Landscape card URL (3:2 CDN crop with hotspot when set). Modal still uses heroImage/gallery. */
+    cardImage: cardImage || media.heroImage || '',
+    heroObjectPosition: objectPositionFromHotspot(doc.heroImage),
     place: doc.builder || doc.yachtType || '',
     meta: metaParts.join(' · '),
     priceLabel: formatYachtPrice(doc),
     builder: doc.builder || '',
     yachtType: doc.yachtType || '',
+    length,
+    lengthUnit,
+    lengthFt,
     lengthLabel,
     cabins: doc.cabins ?? null,
     maxGuests: doc.maxGuests ?? null,

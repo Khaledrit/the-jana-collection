@@ -2,19 +2,29 @@
  * Shared collection card — same visual system as Private Villas cards.
  * kind: jet | yacht | experience
  *
- * Jet cards use a wider media ratio and hotspot-aware framing; other kinds keep 4:5.
+ * Jet and yacht cards use a wider media ratio and hotspot-aware framing;
+ * experiences keep 4:5.
  */
 export function renderCollectionCard(item, { esc }, kind) {
   const isJet = kind === 'jet';
-  const imageSrc = isJet ? (item.cardImage || item.heroImage) : item.heroImage;
-  const objectPosition = isJet ? (item.heroObjectPosition || 'center center') : '';
+  const isYacht = kind === 'yacht';
+  const useWideMedia = isJet || isYacht;
+  const imageSrc = useWideMedia ? (item.cardImage || item.heroImage) : item.heroImage;
+  const objectPosition = useWideMedia ? (item.heroObjectPosition || 'center center') : '';
   const imgStyle = objectPosition ? ` style="object-position:${esc(objectPosition)}"` : '';
-  const imgSize = isJet ? 'width="1200" height="800"' : 'width="900" height="700"';
+  const imgSize = useWideMedia ? 'width="1200" height="800"' : 'width="900" height="700"';
   const media = imageSrc
     ? `<img src="${esc(imageSrc)}" alt="${esc(item.name)}" loading="lazy" ${imgSize}${imgStyle}>`
     : `<div class="jana-property-card__placeholder" aria-hidden="true"><span>${esc(item.name)}</span></div>`;
-  const kindClass = isJet ? ' jana-property-card--jet' : '';
-  const price = kind === 'yacht' && item.priceLabel
+  const kindClass = isJet
+    ? ' jana-property-card--jet'
+    : isYacht
+      ? ' jana-property-card--yacht'
+      : '';
+  const location = isYacht && item.marina
+    ? `<p class="jana-property-card__location">${esc(item.marina)}</p>`
+    : '';
+  const price = isYacht && item.priceLabel
     ? `<p class="jana-property-card__price">${esc(item.priceLabel)}</p>`
     : '';
 
@@ -23,6 +33,7 @@ export function renderCollectionCard(item, { esc }, kind) {
     <div class="jana-property-card__body">
       <h3 class="jana-property-card__name">${esc(item.name)}</h3>
       ${item.place ? `<p class="jana-property-card__place">${esc(item.place)}</p>` : ''}
+      ${location}
       ${item.meta ? `<p class="jana-property-card__meta">${esc(item.meta)}</p>` : ''}
       ${price}
     </div>
