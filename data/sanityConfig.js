@@ -1,5 +1,5 @@
 /**
- * Public Sanity project settings for the JANA Luxury Collection site.
+ * Public Sanity project settings for the Private Luxury Holidays site.
  * Safe for the browser: project ID + dataset only (no write tokens).
  * useCdn: false so publish/unpublish changes are visible immediately.
  * perspective 'published' still excludes drafts.

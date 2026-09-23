@@ -2,7 +2,7 @@ import {defineField, defineType} from 'sanity'
 
 export const property = defineType({
   name: 'property',
-  title: 'Property',
+  title: 'Private Villas',
   type: 'document',
   groups: [
     {name: 'basics', title: 'Basics', default: true},

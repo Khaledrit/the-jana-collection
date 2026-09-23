@@ -10,7 +10,8 @@
     "deploy-graphql": "sanity graphql deploy",
     "dev": "sanity dev",
     "start": "sanity start",
-    "seed:amenities": "sanity exec scripts/seedAmenities.ts --with-user-token"
+    "seed:amenities": "sanity exec scripts/seedAmenities.ts --with-user-token",
+    "seed:jets": "sanity exec scripts/seedPrivateJets.ts --with-user-token"
   },
   "keywords": [
     "sanity"

@@ -1,0 +1,186 @@
+import {defineField, defineType} from 'sanity'
+
+const enquiryStatusList = [
+  {title: 'Available', value: 'Available'},
+  {title: 'On Request', value: 'On Request'},
+  {title: 'Enquire', value: 'Enquire'},
+]
+
+export const experience = defineType({
+  name: 'experience',
+  title: 'Experience',
+  type: 'document',
+  groups: [
+    {name: 'basics', title: 'Basics', default: true},
+    {name: 'media', title: 'Media'},
+    {name: 'details', title: 'Details'},
+    {name: 'seo', title: 'SEO'},
+  ],
+  fields: [
+    defineField({
+      name: 'name',
+      title: 'Name',
+      type: 'string',
+      group: 'basics',
+      description: 'Experience name as shown on the website.',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      group: 'basics',
+      description: 'URL-safe identifier. Click Generate from the name.',
+      options: {source: 'name', maxLength: 96},
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'destination',
+      title: 'Destination',
+      type: 'reference',
+      group: 'basics',
+      description: 'Optional linked destination when the experience belongs to a place.',
+      to: [{type: 'destination'}],
+    }),
+    defineField({
+      name: 'experienceType',
+      title: 'Experience type',
+      type: 'string',
+      group: 'basics',
+      description: 'For example Dining, Wellness, Adventure, Cultural, Private excursion.',
+    }),
+    defineField({
+      name: 'duration',
+      title: 'Duration',
+      type: 'string',
+      group: 'basics',
+      description: 'For example Half Day, Full Day, or 3 Hours.',
+    }),
+    defineField({
+      name: 'location',
+      title: 'Location',
+      type: 'string',
+      group: 'basics',
+      description: 'Free-text location when a destination reference is not enough.',
+    }),
+    defineField({
+      name: 'featured',
+      title: 'Featured',
+      type: 'boolean',
+      group: 'basics',
+      description: 'Enable this to highlight the experience in featured collections.',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'displayPriority',
+      title: 'Display priority',
+      type: 'number',
+      group: 'basics',
+      description: 'Lower numbers appear first in the collection. Example: 1 appears before 2.',
+      validation: (Rule) => Rule.min(0).integer(),
+    }),
+    defineField({
+      name: 'enquiryStatus',
+      title: 'Enquiry status',
+      type: 'string',
+      group: 'basics',
+      description: 'Availability label shown for enquiries.',
+      options: {list: enquiryStatusList, layout: 'dropdown'},
+    }),
+    defineField({
+      name: 'heroImage',
+      title: 'Hero image',
+      type: 'image',
+      group: 'media',
+      description: 'Primary image used on the experience card and presentation.',
+      options: {hotspot: true},
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'gallery',
+      title: 'Gallery',
+      type: 'array',
+      group: 'media',
+      description: 'Additional images shown in the gallery. Drag to reorder.',
+      of: [{type: 'image', options: {hotspot: true}}],
+    }),
+    defineField({
+      name: 'shortDescription',
+      title: 'Short description',
+      type: 'text',
+      group: 'details',
+      rows: 3,
+    }),
+    defineField({
+      name: 'fullDescription',
+      title: 'Full description',
+      type: 'text',
+      group: 'details',
+      rows: 8,
+    }),
+    defineField({
+      name: 'highlights',
+      title: 'Highlights',
+      type: 'array',
+      group: 'details',
+      description: 'Key moments or features. Press Enter after each.',
+      of: [{type: 'string'}],
+      options: {layout: 'tags'},
+    }),
+    defineField({
+      name: 'inclusions',
+      title: 'Inclusions',
+      type: 'array',
+      group: 'details',
+      description: 'What is typically included. Press Enter after each.',
+      of: [{type: 'string'}],
+      options: {layout: 'tags'},
+    }),
+    defineField({
+      name: 'seoTitle',
+      title: 'SEO title',
+      type: 'string',
+      group: 'seo',
+    }),
+    defineField({
+      name: 'seoDescription',
+      title: 'SEO description',
+      type: 'text',
+      group: 'seo',
+      rows: 3,
+    }),
+  ],
+  orderings: [
+    {
+      title: 'Display priority',
+      name: 'displayPriorityAsc',
+      by: [
+        {field: 'displayPriority', direction: 'asc'},
+        {field: 'name', direction: 'asc'},
+      ],
+    },
+    {
+      title: 'Name',
+      name: 'nameAsc',
+      by: [{field: 'name', direction: 'asc'}],
+    },
+  ],
+  preview: {
+    select: {
+      title: 'name',
+      media: 'heroImage',
+      destinationName: 'destination.name',
+      experienceType: 'experienceType',
+      duration: 'duration',
+      featured: 'featured',
+    },
+    prepare({title, media, destinationName, experienceType, duration, featured}) {
+      const parts = [destinationName, experienceType, duration].filter(Boolean)
+      return {
+        title: featured && title ? `${title} ★` : title || 'Untitled experience',
+        subtitle: parts.length ? parts.join(' · ') : undefined,
+        media,
+      }
+    },
+  },
+})

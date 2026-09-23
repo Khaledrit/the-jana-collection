@@ -6,7 +6,7 @@ import {structure} from './structure'
 
 export default defineConfig({
   name: 'default',
-  title: 'JANA Luxury Collection CMS',
+  title: 'Private Luxury Holidays CMS',
 
   projectId: 'm8jragbr',
   dataset: 'production',
