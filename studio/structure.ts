@@ -16,6 +16,17 @@ export const structure: StructureResolver = (S) =>
     .title('Private Luxury Holidays CMS')
     .items([
       S.listItem()
+        .title('Private Islands')
+        .icon(EarthGlobeIcon)
+        .child(
+          S.documentTypeList('privateIsland')
+            .title('Private Islands')
+            .defaultOrdering([
+              {field: 'displayPriority', direction: 'asc'},
+              {field: 'name', direction: 'asc'},
+            ]),
+        ),
+      S.listItem()
         .title('Private Villas')
         .icon(HomeIcon)
         .child(

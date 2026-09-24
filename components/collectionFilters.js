@@ -24,6 +24,16 @@ export function createEmptyYachtFilters() {
   };
 }
 
+export function createEmptyIslandFilters() {
+  return {
+    country: '',
+    locationAtoll: '',
+    experienceType: '',
+    bedrooms: null,
+    guests: null
+  };
+}
+
 export function jetFiltersAreActive(filters) {
   return Boolean(
     filters.aircraftType
@@ -41,6 +51,16 @@ export function yachtFiltersAreActive(filters) {
     || filters.guests != null
     || filters.cabins != null
     || filters.builder
+  );
+}
+
+export function islandFiltersAreActive(filters) {
+  return Boolean(
+    filters.country
+    || filters.locationAtoll
+    || filters.experienceType
+    || filters.bedrooms != null
+    || filters.guests != null
   );
 }
 
@@ -76,6 +96,21 @@ export function getYachtFilterOptions(items) {
   };
 }
 
+export function getIslandFilterOptions(items) {
+  const countries = uniqueSorted(items.map(item => item.country).filter(Boolean));
+  const locations = uniqueSorted(items.map(item => item.locationAtoll).filter(Boolean));
+  const experienceTypes = uniqueSorted(items.map(item => item.experienceType).filter(Boolean));
+  const maxBedrooms = Math.max(0, ...items.map(item => item.bedrooms || 0));
+  const maxGuests = Math.max(0, ...items.map(item => item.maxGuests || 0));
+  return {
+    countries,
+    locations,
+    experienceTypes,
+    bedroomSteps: buildMinSteps(maxBedrooms, [1, 2, 3, 4, 5, 6, 8]),
+    guestSteps: buildMinSteps(maxGuests, [2, 4, 6, 8, 10, 12, 16, 20])
+  };
+}
+
 export function filterJets(items, filters) {
   return items.filter(item => {
     if (filters.aircraftType && item.aircraftType !== filters.aircraftType) return false;
@@ -97,6 +132,17 @@ export function filterYachts(items, filters) {
     if (filters.length != null && (item.lengthFt ?? item.length ?? 0) < filters.length) return false;
     if (filters.guests != null && (item.maxGuests ?? 0) < filters.guests) return false;
     if (filters.cabins != null && (item.cabins ?? 0) < filters.cabins) return false;
+    return true;
+  });
+}
+
+export function filterIslands(items, filters) {
+  return items.filter(item => {
+    if (filters.country && item.country !== filters.country) return false;
+    if (filters.locationAtoll && item.locationAtoll !== filters.locationAtoll) return false;
+    if (filters.experienceType && item.experienceType !== filters.experienceType) return false;
+    if (filters.bedrooms != null && (item.bedrooms ?? 0) < filters.bedrooms) return false;
+    if (filters.guests != null && (item.maxGuests ?? 0) < filters.guests) return false;
     return true;
   });
 }
@@ -151,6 +197,33 @@ export function renderYachtFilters(options, filters, { esc, pick }) {
       ${renderSheetMin('length', pick('Length', 'الطول'), options.lengthSteps, filters.length, pick, esc, ' ft')}
       ${renderSheetMin('guests', pick('Guests', 'الضيوف'), options.guestSteps, filters.guests, pick, esc)}
       ${renderSheetMin('cabins', pick('Cabins', 'الكبائن'), options.cabinSteps, filters.cabins, pick, esc)}
+    `
+  });
+}
+
+export function renderIslandFilters(options, filters, { esc, pick }) {
+  return renderCollectionFilters({
+    kind: 'island',
+    filters,
+    active: islandFiltersAreActive(filters),
+    activeCount: countIslandActive(filters),
+    ariaLabel: pick('Private island filters', 'تصفية الجزر الخاصة'),
+    showLabel: pick('Show islands', 'عرض الجزر'),
+    esc,
+    pick,
+    desktopControls: `
+      ${renderSelectFilter('country', pick('Country', 'البلد'), options.countries, filters.country, pick, esc)}
+      ${renderSelectFilter('locationAtoll', pick('Location / Atoll', 'الموقع / الأتول'), options.locations, filters.locationAtoll, pick, esc)}
+      ${renderSelectFilter('experienceType', pick('Experience type', 'نوع التجربة'), options.experienceTypes, filters.experienceType, pick, esc)}
+      ${renderMinFilter('bedrooms', pick('Bedrooms', 'غرف النوم'), options.bedroomSteps, filters.bedrooms, pick, esc)}
+      ${renderMinFilter('guests', pick('Guests', 'الضيوف'), options.guestSteps, filters.guests, pick, esc)}
+    `,
+    sheetBody: `
+      ${renderSheetSelect('country', pick('Country', 'البلد'), options.countries, filters.country, pick, esc)}
+      ${renderSheetSelect('locationAtoll', pick('Location / Atoll', 'الموقع / الأتول'), options.locations, filters.locationAtoll, pick, esc)}
+      ${renderSheetSelect('experienceType', pick('Experience type', 'نوع التجربة'), options.experienceTypes, filters.experienceType, pick, esc)}
+      ${renderSheetMin('bedrooms', pick('Bedrooms', 'غرف النوم'), options.bedroomSteps, filters.bedrooms, pick, esc)}
+      ${renderSheetMin('guests', pick('Guests', 'الضيوف'), options.guestSteps, filters.guests, pick, esc)}
     `
   });
 }
@@ -213,10 +286,41 @@ export function formatYachtFilterTriggerLabel(key, filters, pick) {
   return '';
 }
 
+export function formatIslandFilterTriggerLabel(key, filters, pick) {
+  if (key === 'country') {
+    return filters.country
+      ? `${pick('Country', 'البلد')}: ${filters.country}`
+      : pick('Country', 'البلد');
+  }
+  if (key === 'locationAtoll') {
+    return filters.locationAtoll
+      ? `${pick('Location / Atoll', 'الموقع / الأتول')}: ${filters.locationAtoll}`
+      : pick('Location / Atoll', 'الموقع / الأتول');
+  }
+  if (key === 'experienceType') {
+    return filters.experienceType
+      ? `${pick('Experience type', 'نوع التجربة')}: ${filters.experienceType}`
+      : pick('Experience type', 'نوع التجربة');
+  }
+  if (key === 'bedrooms') {
+    return filters.bedrooms != null
+      ? `${pick('Bedrooms', 'غرف النوم')}: ${filters.bedrooms}+`
+      : pick('Bedrooms', 'غرف النوم');
+  }
+  if (key === 'guests') {
+    return filters.guests != null
+      ? `${pick('Guests', 'الضيوف')}: ${filters.guests}+`
+      : pick('Guests', 'الضيوف');
+  }
+  return '';
+}
+
 export function renderCollectionFilterEmptyState(kind, { esc, pick }) {
   const message = kind === 'jet'
     ? pick('No aircraft match your current selection.', 'لا توجد طائرات تطابق اختياركم الحالي.')
-    : pick('No yachts match your current selection.', 'لا توجد يخوت تطابق اختياركم الحالي.');
+    : kind === 'island'
+      ? pick('No private islands match your current selection.', 'لا توجد جزر خاصة تطابق اختياركم الحالي.')
+      : pick('No yachts match your current selection.', 'لا توجد يخوت تطابق اختياركم الحالي.');
   return `<div class="villa-filters__empty" data-filter-empty data-collection-filter-empty="${esc(kind)}">
     <p>${esc(message)}</p>
     <button type="button" class="text-link" data-filter-clear>${esc(pick('Clear filters', 'مسح التصفية'))}</button>
@@ -379,6 +483,16 @@ function countYachtActive(filters) {
   if (filters.length != null) n += 1;
   if (filters.guests != null) n += 1;
   if (filters.cabins != null) n += 1;
+  return n;
+}
+
+function countIslandActive(filters) {
+  let n = 0;
+  if (filters.country) n += 1;
+  if (filters.locationAtoll) n += 1;
+  if (filters.experienceType) n += 1;
+  if (filters.bedrooms != null) n += 1;
+  if (filters.guests != null) n += 1;
   return n;
 }
 
