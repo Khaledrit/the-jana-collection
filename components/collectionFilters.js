@@ -16,7 +16,6 @@ export function createEmptyJetFilters() {
 export function createEmptyYachtFilters() {
   return {
     country: '',
-    marina: '',
     yachtType: '',
     length: null,
     guests: null,
@@ -37,7 +36,6 @@ export function jetFiltersAreActive(filters) {
 export function yachtFiltersAreActive(filters) {
   return Boolean(
     filters.country
-    || filters.marina
     || filters.yachtType
     || filters.length != null
     || filters.guests != null
@@ -63,7 +61,6 @@ export function getYachtFilterOptions(items) {
   const countries = uniqueSorted(
     items.flatMap(item => Array.isArray(item.countries) ? item.countries : []).filter(Boolean)
   );
-  const marinas = uniqueSorted(items.map(item => item.marina).filter(Boolean));
   const yachtTypes = uniqueSorted(items.map(item => item.yachtType).filter(Boolean));
   const builders = uniqueSorted(items.map(item => item.builder).filter(Boolean));
   const maxLength = Math.max(0, ...items.map(item => item.lengthFt || item.length || 0));
@@ -71,7 +68,6 @@ export function getYachtFilterOptions(items) {
   const maxCabins = Math.max(0, ...items.map(item => item.cabins || 0));
   return {
     countries,
-    marinas,
     yachtTypes,
     builders,
     lengthSteps: buildMinSteps(maxLength, [60, 70, 80, 100, 120, 140, 160, 200, 250]),
@@ -96,7 +92,6 @@ export function filterYachts(items, filters) {
       const countries = Array.isArray(item.countries) ? item.countries : [];
       if (!countries.includes(filters.country)) return false;
     }
-    if (filters.marina && item.marina !== filters.marina) return false;
     if (filters.yachtType && item.yachtType !== filters.yachtType) return false;
     if (filters.builder && item.builder !== filters.builder) return false;
     if (filters.length != null && (item.lengthFt ?? item.length ?? 0) < filters.length) return false;
@@ -143,7 +138,6 @@ export function renderYachtFilters(options, filters, { esc, pick }) {
     pick,
     desktopControls: `
       ${renderSelectFilter('country', pick('Country', 'البلد'), options.countries, filters.country, pick, esc)}
-      ${renderSelectFilter('marina', pick('Home location', 'الموقع الرئيسي'), options.marinas, filters.marina, pick, esc)}
       ${renderSelectFilter('yachtType', pick('Yacht type', 'نوع اليخت'), options.yachtTypes, filters.yachtType, pick, esc)}
       ${renderSelectFilter('builder', pick('Builder', 'الصانع'), options.builders, filters.builder, pick, esc)}
       ${renderMinFilter('length', pick('Length', 'الطول'), options.lengthSteps, filters.length, pick, esc, ' ft')}
@@ -152,7 +146,6 @@ export function renderYachtFilters(options, filters, { esc, pick }) {
     `,
     sheetBody: `
       ${renderSheetSelect('country', pick('Country', 'البلد'), options.countries, filters.country, pick, esc)}
-      ${renderSheetSelect('marina', pick('Home location', 'الموقع الرئيسي'), options.marinas, filters.marina, pick, esc)}
       ${renderSheetSelect('yachtType', pick('Yacht type', 'نوع اليخت'), options.yachtTypes, filters.yachtType, pick, esc)}
       ${renderSheetSelect('builder', pick('Builder', 'الصانع'), options.builders, filters.builder, pick, esc)}
       ${renderSheetMin('length', pick('Length', 'الطول'), options.lengthSteps, filters.length, pick, esc, ' ft')}
@@ -191,11 +184,6 @@ export function formatYachtFilterTriggerLabel(key, filters, pick) {
     return filters.country
       ? `${pick('Country', 'البلد')}: ${filters.country}`
       : pick('Country', 'البلد');
-  }
-  if (key === 'marina') {
-    return filters.marina
-      ? `${pick('Home location', 'الموقع الرئيسي')}: ${filters.marina}`
-      : pick('Home location', 'الموقع الرئيسي');
   }
   if (key === 'yachtType') {
     return filters.yachtType
@@ -386,7 +374,6 @@ function countJetActive(filters) {
 function countYachtActive(filters) {
   let n = 0;
   if (filters.country) n += 1;
-  if (filters.marina) n += 1;
   if (filters.yachtType) n += 1;
   if (filters.builder) n += 1;
   if (filters.length != null) n += 1;
