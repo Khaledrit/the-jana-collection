@@ -136,11 +136,21 @@ export const yacht = defineType({
     }),
     defineField({
       name: 'region',
-      title: 'Region / destination',
+      title: 'Region (internal)',
       type: 'string',
       group: 'vessel',
       description:
-        'Broad charter region used for filtering, for example Mediterranean, Middle East, Caribbean, Northern Europe. Do not invent a region.',
+        'Optional broad charter region for internal use, for example Mediterranean or Middle East. Not used as the primary website filter — use Countries instead.',
+    }),
+    defineField({
+      name: 'countries',
+      title: 'Countries',
+      type: 'array',
+      group: 'vessel',
+      description:
+        'Verified charter or home countries. Use full country names. Add multiple when the yacht operates across several verified countries. Do not invent countries from a broad region alone.',
+      of: [{type: 'string'}],
+      options: {layout: 'tags'},
     }),
     defineField({
       name: 'marina',
@@ -148,7 +158,7 @@ export const yacht = defineType({
       type: 'string',
       group: 'vessel',
       description:
-        'Verified home marina or home base only, for example Dubai Harbour or Monaco. Leave blank when only a charter region is known.',
+        'Verified home marina or home base only, for example Dubai Harbour or Monaco. Leave blank when only charter countries are known.',
     }),
     defineField({
       name: 'cruisingArea',
@@ -156,7 +166,7 @@ export const yacht = defineType({
       type: 'string',
       group: 'vessel',
       description:
-        'More specific cruising notes when useful, for example Dubai coastline or Greece, Turkey. Separate from home marina.',
+        'More specific cruising notes when useful, for example Dubai coastline or Greece, Turkey. Separate from home marina and countries.',
     }),
     defineField({
       name: 'yearBuilt',

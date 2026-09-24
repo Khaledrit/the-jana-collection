@@ -28,8 +28,10 @@ type YachtSeed = {
   crew?: number
   /** Verified home marina/base only — leave blank when unknown. */
   marina?: string
-  /** Broad region/destination for filters, e.g. Mediterranean, Middle East. */
+  /** Broad region for internal use only — not the primary website filter. */
   region?: string
+  /** Verified charter/home countries. Prefer multiple entries over inventing one. */
+  countries?: string[]
   /** More specific cruising notes when useful. */
   cruisingArea?: string
   yearBuilt?: number
@@ -58,6 +60,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 1,
     enquiryStatus: "On Request",
@@ -80,6 +83,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 2,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 2,
     enquiryStatus: "On Request",
@@ -102,6 +106,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 3,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 3,
     enquiryStatus: "On Request",
@@ -124,6 +129,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 3,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 4,
     enquiryStatus: "On Request",
@@ -146,6 +152,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 5,
     enquiryStatus: "On Request",
@@ -168,6 +175,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 6,
     enquiryStatus: "On Request",
@@ -190,6 +198,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 7,
     enquiryStatus: "On Request",
@@ -212,6 +221,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Marsa Al Arab",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 8,
     enquiryStatus: "On Request",
@@ -234,6 +244,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 9,
     enquiryStatus: "On Request",
@@ -256,6 +267,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 10,
     enquiryStatus: "On Request",
@@ -278,6 +290,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 3,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 11,
     enquiryStatus: "On Request",
@@ -300,6 +313,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 12,
     enquiryStatus: "On Request",
@@ -322,6 +336,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 13,
     enquiryStatus: "On Request",
@@ -344,6 +359,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 14,
     enquiryStatus: "On Request",
@@ -366,6 +382,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 15,
     enquiryStatus: "On Request",
@@ -388,6 +405,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 16,
     enquiryStatus: "On Request",
@@ -410,6 +428,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 17,
     enquiryStatus: "On Request",
@@ -432,6 +451,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 2,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 18,
     enquiryStatus: "On Request",
@@ -454,6 +474,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 5,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 19,
     enquiryStatus: "On Request",
@@ -476,6 +497,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 7,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 20,
     enquiryStatus: "On Request",
@@ -498,6 +520,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 5,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 21,
     enquiryStatus: "On Request",
@@ -520,6 +543,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 5,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 22,
     enquiryStatus: "On Request",
@@ -542,6 +566,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 6,
     marina: "Marsa Al Arab",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 23,
     enquiryStatus: "On Request",
@@ -564,6 +589,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 5,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 24,
     enquiryStatus: "On Request",
@@ -586,6 +612,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 5,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 25,
     enquiryStatus: "On Request",
@@ -608,6 +635,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 6,
     marina: "JA Marina",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 26,
     enquiryStatus: "On Request",
@@ -630,6 +658,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 5,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 27,
     enquiryStatus: "On Request",
@@ -651,6 +680,7 @@ const YACHTS: YachtSeed[] = [
     maxGuests: 100,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 28,
     enquiryStatus: "On Request",
@@ -673,6 +703,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 5,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 29,
     enquiryStatus: "On Request",
@@ -695,6 +726,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 6,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 30,
     enquiryStatus: "On Request",
@@ -715,6 +747,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 6,
     marina: "Dubai Harbour",
     region: "Middle East",
+    countries: ["United Arab Emirates"],
     cruisingArea: "Dubai coastline",
     displayPriority: 31,
     enquiryStatus: "On Request",
@@ -737,6 +770,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 6,
     crew: 6,
     region: "Mediterranean",
+    countries: ["Turkey"],
     cruisingArea: "Turkey",
     yearBuilt: 2021,
     yearRefit: 2024,
@@ -760,6 +794,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 13,
     crew: 7,
     region: "Red Sea",
+    countries: ["Egypt"],
     cruisingArea: "Egypt",
     yearBuilt: 2024,
     displayPriority: 33,
@@ -782,6 +817,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     crew: 5,
     region: "Mediterranean",
+    countries: ["Italy"],
     cruisingArea: "Italy",
     yearBuilt: 2023,
     displayPriority: 34,
@@ -804,6 +840,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 4,
     crew: 5,
     region: "Mediterranean",
+    countries: ["Croatia", "Greece", "Montenegro", "Turkey"],
     cruisingArea: "Croatia, Greece, Montenegro, Turkey",
     yearBuilt: 2004,
     yearRefit: 2017,
@@ -827,6 +864,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 6,
     crew: 6,
     region: "Middle East",
+    countries: ["Oman"],
     cruisingArea: "Oman",
     yearBuilt: 2025,
     displayPriority: 36,
@@ -849,6 +887,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 6,
     crew: 5,
     region: "Mediterranean",
+    countries: ["Spain"],
     cruisingArea: "Spain",
     yearBuilt: 2005,
     yearRefit: 2024,
@@ -872,6 +911,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 5,
     crew: 5,
     region: "Mediterranean",
+    countries: ["Spain"],
     cruisingArea: "Spain",
     yearBuilt: 2022,
     displayPriority: 38,
@@ -894,6 +934,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 5,
     crew: 7,
     region: "Mediterranean",
+    countries: ["Greece"],
     cruisingArea: "Greece",
     yearBuilt: 2006,
     yearRefit: 2017,
@@ -917,6 +958,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 5,
     crew: 7,
     region: "Mediterranean",
+    countries: ["Greece", "Turkey"],
     cruisingArea: "Greece, Turkey",
     yearBuilt: 2016,
     yearRefit: 2020,
@@ -940,6 +982,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 6,
     crew: 13,
     region: "Mediterranean",
+    countries: ["Greece", "Turkey"],
     cruisingArea: "Greece, Turkey",
     yearBuilt: 1999,
     yearRefit: 2019,
@@ -963,6 +1006,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 16,
     crew: 11,
     region: "Mediterranean",
+    countries: ["Croatia", "Montenegro"],
     cruisingArea: "Croatia, Montenegro",
     yearBuilt: 2021,
     yearRefit: 2024,
@@ -986,6 +1030,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 5,
     crew: 14,
     region: "Mediterranean",
+    countries: ["France", "Italy", "Bahamas"],
     cruisingArea: "France, Italy",
     yearBuilt: 2013,
     yearRefit: 2025,
@@ -1009,6 +1054,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 11,
     crew: 12,
     region: "Mediterranean",
+    countries: ["Croatia", "Montenegro"],
     cruisingArea: "Croatia, Montenegro",
     yearBuilt: 2021,
     yearRefit: 2026,
@@ -1032,6 +1078,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 6,
     crew: 15,
     region: "Mediterranean",
+    countries: ["Croatia", "Greece", "Italy", "Montenegro", "Turkey"],
     cruisingArea: "Croatia, Greece, Italy, Montenegro, Turkey",
     yearBuilt: 2015,
     yearRefit: 2025,
@@ -1055,6 +1102,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 7,
     crew: 14,
     region: "Mediterranean",
+    countries: ["France", "Greece", "Italy", "Malta", "Turkey", "Maldives", "Seychelles"],
     cruisingArea: "France, Greece, Italy, Malta, Turkey",
     yearBuilt: 1986,
     yearRefit: 2025,
@@ -1078,6 +1126,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 6,
     crew: 25,
     region: "Northern Europe",
+    countries: ["Norway"],
     cruisingArea: "Northern Europe, Norway",
     yearBuilt: 2020,
     displayPriority: 47,
@@ -1100,6 +1149,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 7,
     crew: 22,
     region: "Mediterranean",
+    countries: ["Croatia", "France", "Finland", "Norway"],
     cruisingArea: "Croatia, France, Northern Europe, Finland, Norway",
     yearBuilt: 1994,
     yearRefit: 2022,
@@ -1123,6 +1173,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 7,
     crew: 19,
     region: "Mediterranean",
+    countries: ["Croatia", "France", "Greece", "Italy", "Montenegro", "Turkey", "Philippines", "Thailand"],
     cruisingArea: "Croatia, France, Greece, Italy, Montenegro, Turkey",
     yearBuilt: 2015,
     yearRefit: 2025,
@@ -1146,6 +1197,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 11,
     crew: 24,
     region: "Mediterranean",
+    countries: ["France"],
     cruisingArea: "France",
     yearBuilt: 2019,
     displayPriority: 50,
@@ -1168,6 +1220,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 19,
     crew: 30,
     region: "Mediterranean",
+    countries: ["Croatia", "France", "Greece", "Italy", "Malta", "Montenegro", "Turkey"],
     cruisingArea: "Croatia, France, Greece, Italy, Malta, Montenegro, Turkey",
     yearBuilt: 1998,
     yearRefit: 2024,
@@ -1191,6 +1244,7 @@ const YACHTS: YachtSeed[] = [
     cabins: 7,
     crew: 28,
     region: "Northern Europe",
+    // countries omitted — source lists Northern Europe only, not a specific country
     cruisingArea: "Northern Europe",
     yearBuilt: 1994,
     yearRefit: 2025,
@@ -1222,6 +1276,7 @@ type ExistingYacht = {
   crew?: number
   marina?: string
   region?: string
+  countries?: string[]
   cruisingArea?: string
   yearBuilt?: number
   yearRefit?: number
@@ -1261,6 +1316,7 @@ async function main() {
       crew,
       marina,
       region,
+      countries,
       cruisingArea,
       yearBuilt,
       yearRefit,
@@ -1316,6 +1372,7 @@ async function main() {
       if (isBlank(preferred.cabins) && item.cabins != null) patch.cabins = item.cabins
       if (isBlank(preferred.marina) && item.marina) patch.marina = item.marina
       if (isBlank(preferred.region) && item.region) patch.region = item.region
+      if (isBlank(preferred.countries) && item.countries?.length) patch.countries = item.countries
       if (isBlank(preferred.cruisingArea) && item.cruisingArea) patch.cruisingArea = item.cruisingArea
       if (isBlank(preferred.crew) && item.crew != null) patch.crew = item.crew
       if (isBlank(preferred.yearBuilt) && item.yearBuilt != null) patch.yearBuilt = item.yearBuilt
@@ -1370,6 +1427,7 @@ async function main() {
     if (item.crew != null) doc.crew = item.crew
     if (item.marina) doc.marina = item.marina
     if (item.region) doc.region = item.region
+    if (item.countries?.length) doc.countries = item.countries
     if (item.cruisingArea) doc.cruisingArea = item.cruisingArea
     if (item.yearBuilt != null) doc.yearBuilt = item.yearBuilt
     if (item.yearRefit != null) doc.yearRefit = item.yearRefit
@@ -1404,7 +1462,8 @@ async function main() {
   missingImages.forEach((name) => console.log(`  - ${name}`))
   console.log('\nNote: heroImage left empty deliberately. Upload licensed photos in Studio.')
   console.log('Home marina left blank for international yachts unless a verified berth is known.')
-  console.log('Region / cruising area filled from verified charter destinations only.')
+  console.log('Countries filled from verified charter destinations only (not broad regions).')
+  console.log('Region retained for internal use; Country is the primary website filter.')
 }
 
 main().catch((error) => {

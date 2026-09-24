@@ -26,6 +26,7 @@ export const YACHTS_QUERY = `*[_type == "yacht" && defined(slug.current)] | orde
   crew,
   marina,
   region,
+  countries,
   cruisingArea,
   yearBuilt,
   yearRefit,
@@ -100,11 +101,13 @@ export function mapSanityYacht(doc) {
     crew: doc.crew ?? null,
     marina: doc.marina || '',
     region: doc.region || '',
+    countries: normalizeCountries(doc.countries),
     cruisingArea: doc.cruisingArea || '',
     yearBuilt: doc.yearBuilt ?? null,
     yearRefit: doc.yearRefit ?? null,
     locationLabel: formatYachtLocationLabel(doc),
     cardLocation: formatYachtCardLocation(doc),
+    countriesLabel: normalizeCountries(doc.countries).join(' · '),
     startingPrice: doc.startingPrice ?? null,
     currency: doc.currency || '',
     pricingPeriod: doc.pricingPeriod || '',
@@ -120,20 +123,24 @@ export function mapSanityYacht(doc) {
   };
 }
 
-/** Card line: home marina and/or region — never invents a location. */
-function formatYachtCardLocation(doc) {
-  return [doc.marina, doc.region].filter(Boolean).join(' · ');
+function normalizeCountries(value) {
+  if (Array.isArray(value)) return value.map(c => String(c || '').trim()).filter(Boolean);
+  if (typeof value === 'string' && value.trim()) return [value.trim()];
+  return [];
 }
 
-/** Modal / detail line: marina, region, then specific cruising notes when distinct. */
+/** Card line: home marina and/or countries — never invents a location. */
+function formatYachtCardLocation(doc) {
+  const countries = normalizeCountries(doc.countries);
+  const countryLine = countries.join(' · ');
+  if (doc.marina && countryLine) return `${doc.marina} · ${countryLine}`;
+  if (doc.marina) return doc.marina;
+  return countryLine;
+}
+
+/** Modal summary line kept for compatibility; prefer discrete stats. */
 function formatYachtLocationLabel(doc) {
-  const parts = [];
-  if (doc.marina) parts.push(doc.marina);
-  if (doc.region) parts.push(doc.region);
-  if (doc.cruisingArea && doc.cruisingArea !== doc.marina && doc.cruisingArea !== doc.region) {
-    parts.push(doc.cruisingArea);
-  }
-  return parts.join(' · ');
+  return formatYachtCardLocation(doc);
 }
 
 function formatYachtPrice(doc) {

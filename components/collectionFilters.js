@@ -15,7 +15,7 @@ export function createEmptyJetFilters() {
 
 export function createEmptyYachtFilters() {
   return {
-    region: '',
+    country: '',
     marina: '',
     yachtType: '',
     length: null,
@@ -36,7 +36,7 @@ export function jetFiltersAreActive(filters) {
 
 export function yachtFiltersAreActive(filters) {
   return Boolean(
-    filters.region
+    filters.country
     || filters.marina
     || filters.yachtType
     || filters.length != null
@@ -60,7 +60,9 @@ export function getJetFilterOptions(items) {
 }
 
 export function getYachtFilterOptions(items) {
-  const regions = uniqueSorted(items.map(item => item.region).filter(Boolean));
+  const countries = uniqueSorted(
+    items.flatMap(item => Array.isArray(item.countries) ? item.countries : []).filter(Boolean)
+  );
   const marinas = uniqueSorted(items.map(item => item.marina).filter(Boolean));
   const yachtTypes = uniqueSorted(items.map(item => item.yachtType).filter(Boolean));
   const builders = uniqueSorted(items.map(item => item.builder).filter(Boolean));
@@ -68,7 +70,7 @@ export function getYachtFilterOptions(items) {
   const maxGuests = Math.max(0, ...items.map(item => item.maxGuests || 0));
   const maxCabins = Math.max(0, ...items.map(item => item.cabins || 0));
   return {
-    regions,
+    countries,
     marinas,
     yachtTypes,
     builders,
@@ -90,7 +92,10 @@ export function filterJets(items, filters) {
 
 export function filterYachts(items, filters) {
   return items.filter(item => {
-    if (filters.region && item.region !== filters.region) return false;
+    if (filters.country) {
+      const countries = Array.isArray(item.countries) ? item.countries : [];
+      if (!countries.includes(filters.country)) return false;
+    }
     if (filters.marina && item.marina !== filters.marina) return false;
     if (filters.yachtType && item.yachtType !== filters.yachtType) return false;
     if (filters.builder && item.builder !== filters.builder) return false;
@@ -137,7 +142,7 @@ export function renderYachtFilters(options, filters, { esc, pick }) {
     esc,
     pick,
     desktopControls: `
-      ${renderSelectFilter('region', pick('Region', 'المنطقة'), options.regions, filters.region, pick, esc)}
+      ${renderSelectFilter('country', pick('Country', 'البلد'), options.countries, filters.country, pick, esc)}
       ${renderSelectFilter('marina', pick('Home location', 'الموقع الرئيسي'), options.marinas, filters.marina, pick, esc)}
       ${renderSelectFilter('yachtType', pick('Yacht type', 'نوع اليخت'), options.yachtTypes, filters.yachtType, pick, esc)}
       ${renderSelectFilter('builder', pick('Builder', 'الصانع'), options.builders, filters.builder, pick, esc)}
@@ -146,7 +151,7 @@ export function renderYachtFilters(options, filters, { esc, pick }) {
       ${renderMinFilter('cabins', pick('Cabins', 'الكبائن'), options.cabinSteps, filters.cabins, pick, esc)}
     `,
     sheetBody: `
-      ${renderSheetSelect('region', pick('Region', 'المنطقة'), options.regions, filters.region, pick, esc)}
+      ${renderSheetSelect('country', pick('Country', 'البلد'), options.countries, filters.country, pick, esc)}
       ${renderSheetSelect('marina', pick('Home location', 'الموقع الرئيسي'), options.marinas, filters.marina, pick, esc)}
       ${renderSheetSelect('yachtType', pick('Yacht type', 'نوع اليخت'), options.yachtTypes, filters.yachtType, pick, esc)}
       ${renderSheetSelect('builder', pick('Builder', 'الصانع'), options.builders, filters.builder, pick, esc)}
@@ -182,10 +187,10 @@ export function formatJetFilterTriggerLabel(key, filters, pick) {
 }
 
 export function formatYachtFilterTriggerLabel(key, filters, pick) {
-  if (key === 'region') {
-    return filters.region
-      ? `${pick('Region', 'المنطقة')}: ${filters.region}`
-      : pick('Region', 'المنطقة');
+  if (key === 'country') {
+    return filters.country
+      ? `${pick('Country', 'البلد')}: ${filters.country}`
+      : pick('Country', 'البلد');
   }
   if (key === 'marina') {
     return filters.marina
@@ -380,7 +385,7 @@ function countJetActive(filters) {
 
 function countYachtActive(filters) {
   let n = 0;
-  if (filters.region) n += 1;
+  if (filters.country) n += 1;
   if (filters.marina) n += 1;
   if (filters.yachtType) n += 1;
   if (filters.builder) n += 1;
