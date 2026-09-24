@@ -75,6 +75,6 @@ export const properties = [
 ];
 
 export const ui = {
-  en:{nav:["Destinations","The Collection","Private Villas","Private Aviation","Yachts","Experiences","About"], design:"Design Your Journey", search:"Search", division:"Private Luxury Holidays"},
-  ar:{nav:["الوجهات","المجموعة","الفلل الخاصة","الطيران الخاص","اليخوت","التجارب","من نحن"], design:"صمّم رحلتك", search:"بحث", division:"عطلات فاخرة خاصة"}
+  en:{nav:["Destinations","The Collection","Private Islands","Private Villas","Private Aviation","Yachts","Experiences","About"], design:"Design Your Journey", search:"Search", division:"Private Luxury Holidays"},
+  ar:{nav:["الوجهات","المجموعة","الجزر الخاصة","الفلل الخاصة","الطيران الخاص","اليخوت","التجارب","من نحن"], design:"صمّم رحلتك", search:"بحث", division:"عطلات فاخرة خاصة"}
 };

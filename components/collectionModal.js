@@ -16,6 +16,12 @@ const KIND_COPY = {
     ctaEn: 'Enquire about this yacht →',
     ctaAr: 'استفسروا عن هذا اليخت ←'
   },
+  island: {
+    eyebrowEn: 'Private island',
+    eyebrowAr: 'جزيرة خاصة',
+    ctaEn: 'Enquire about this private island →',
+    ctaAr: 'استفسروا عن هذه الجزيرة الخاصة ←'
+  },
   experience: {
     eyebrowEn: 'Experience',
     eyebrowAr: 'تجربة',
@@ -31,7 +37,7 @@ export function renderCollectionModalContent(item, ctx, kind) {
   if (item.heroImage && !gallery.includes(item.heroImage)) gallery.unshift(item.heroImage);
   const stats = buildStats(item, kind, pick);
   const columns = buildColumns(item, kind, pick, esc);
-  const objectPosition = kind === 'yacht' && item.heroObjectPosition
+  const objectPosition = (kind === 'yacht' || kind === 'island') && item.heroObjectPosition
     ? item.heroObjectPosition
     : '';
   const imgStyle = objectPosition ? ` style="object-position:${esc(objectPosition)}"` : '';
@@ -61,8 +67,11 @@ export function renderCollectionModalContent(item, ctx, kind) {
       <div class="eyebrow">${pick(copy.eyebrowEn, copy.eyebrowAr)}</div>
       <h2 id="propertyModalTitle">${esc(item.name)}</h2>
       ${item.place ? `<p class="property-modal__place">${esc(item.place)}</p>` : ''}
-      ${kind === 'yacht' && item.cardLocation
+      ${(kind === 'yacht' || kind === 'island') && item.cardLocation
         ? `<p class="property-modal__place">${esc(item.cardLocation)}</p>`
+        : ''}
+      ${kind === 'island' && item.janaHighlight
+        ? `<p class="property-modal__price">${esc(item.janaHighlight)}</p>`
         : ''}
 
       ${stats.length ? `<div class="property-modal__stats">
@@ -105,6 +114,16 @@ function buildStats(item, kind, pick) {
       item.minimumBookingLabel ? [item.minimumBookingLabel, pick('Minimum', 'الحد الأدنى')] : null
     ].filter(Boolean);
   }
+  if (kind === 'island') {
+    return [
+      item.country ? [item.country, pick('Country', 'البلد')] : null,
+      item.locationAtoll ? [item.locationAtoll, pick('Location', 'الموقع')] : null,
+      item.experienceType ? [item.experienceType, pick('Experience', 'التجربة')] : null,
+      item.bedrooms != null ? [`${item.bedrooms}`, pick('Bedrooms', 'غرف النوم')] : null,
+      item.maxGuests != null ? [`${item.maxGuests}`, pick('Guests', 'الضيوف')] : null,
+      item.residenceSizeLabel ? [item.residenceSizeLabel, pick('Residence size', 'مساحة الإقامة')] : null
+    ].filter(Boolean);
+  }
   return [
     item.duration ? [item.duration, pick('Duration', 'المدة')] : null,
     item.experienceType ? [item.experienceType, pick('Type', 'النوع')] : null,
@@ -128,6 +147,11 @@ function buildColumns(item, kind, pick, esc) {
     rightTitle = pick('Services', 'الخدمات');
     leftItems = item.amenities || [];
     rightItems = item.services || [];
+  } else if (kind === 'island') {
+    leftTitle = pick('Perfect for', 'مثالية لـ');
+    rightTitle = pick('Features / services', 'المميزات / الخدمات');
+    leftItems = item.perfectFor || [];
+    rightItems = item.features || [];
   } else {
     leftTitle = pick('Highlights', 'أبرز ما فيها');
     rightTitle = pick('Inclusions', 'ما يشمله');

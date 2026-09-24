@@ -1,18 +1,19 @@
 /**
  * Shared collection card — same visual system as Private Villas cards.
- * kind: jet | yacht | experience
+ * kind: jet | yacht | experience | island
  *
  * Jet and yacht cards use a wider media ratio and hotspot-aware framing;
- * experiences keep 4:5.
+ * islands and experiences keep 4:5.
  */
 export function renderCollectionCard(item, { esc }, kind) {
   const isJet = kind === 'jet';
   const isYacht = kind === 'yacht';
+  const isIsland = kind === 'island';
   const useWideMedia = isJet || isYacht;
-  const imageSrc = useWideMedia ? (item.cardImage || item.heroImage) : item.heroImage;
-  const objectPosition = useWideMedia ? (item.heroObjectPosition || 'center center') : '';
+  const imageSrc = useWideMedia ? (item.cardImage || item.heroImage) : (item.cardImage || item.heroImage);
+  const objectPosition = (useWideMedia || isIsland) ? (item.heroObjectPosition || 'center center') : '';
   const imgStyle = objectPosition ? ` style="object-position:${esc(objectPosition)}"` : '';
-  const imgSize = useWideMedia ? 'width="1200" height="800"' : 'width="900" height="700"';
+  const imgSize = useWideMedia ? 'width="1200" height="800"' : 'width="900" height="1125"';
   const media = imageSrc
     ? `<img src="${esc(imageSrc)}" alt="${esc(item.name)}" loading="lazy" ${imgSize}${imgStyle}>`
     : `<div class="jana-property-card__placeholder" aria-hidden="true"><span>${esc(item.name)}</span></div>`;
@@ -20,8 +21,10 @@ export function renderCollectionCard(item, { esc }, kind) {
     ? ' jana-property-card--jet'
     : isYacht
       ? ' jana-property-card--yacht'
-      : '';
-  const location = isYacht && item.cardLocation
+      : isIsland
+        ? ' jana-property-card--island'
+        : '';
+  const location = (isYacht || isIsland) && item.cardLocation
     ? `<p class="jana-property-card__location">${esc(item.cardLocation)}</p>`
     : '';
   const price = isYacht && item.priceLabel

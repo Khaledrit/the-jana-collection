@@ -3,6 +3,7 @@ import { OWNER_CONFIG, brandName, brandByline, brandTitle, BRAND } from './confi
 import { getCollectionProperties, getPropertyBySlug } from './data/properties.js';
 import { getCollectionPrivateJets, getPrivateJetBySlug } from './data/privateJets.js';
 import { getCollectionYachts, getYachtBySlug } from './data/yachts.js';
+import { getCollectionPrivateIslands, getPrivateIslandBySlug } from './data/privateIslands.js';
 import { getCollectionExperiences, getExperienceBySlug } from './data/experiences.js';
 import { renderPropertyCardList } from './components/propertyCard.js';
 import { renderCollectionCardList } from './components/collectionCard.js';
@@ -20,17 +21,23 @@ import {
 import {
   createEmptyJetFilters,
   createEmptyYachtFilters,
+  createEmptyIslandFilters,
   getJetFilterOptions,
   getYachtFilterOptions,
+  getIslandFilterOptions,
   filterJets,
   filterYachts,
+  filterIslands,
   jetFiltersAreActive,
   yachtFiltersAreActive,
+  islandFiltersAreActive,
   renderJetFilters,
   renderYachtFilters,
+  renderIslandFilters,
   renderCollectionFilterEmptyState,
   formatJetFilterTriggerLabel,
-  formatYachtFilterTriggerLabel
+  formatYachtFilterTriggerLabel,
+  formatIslandFilterTriggerLabel
 } from './components/collectionFilters.js';
 
 const app = document.querySelector('#app');
@@ -89,9 +96,11 @@ let villaFilterOutsideHandler = null;
 let villaFilterKeyHandler = null;
 let jetItems = [];
 let yachtItems = [];
+let islandItems = [];
 let experienceItems = [];
 let jetFilterState = createEmptyJetFilters();
 let yachtFilterState = createEmptyYachtFilters();
+let islandFilterState = createEmptyIslandFilters();
 let collectionFilterOutsideHandler = null;
 let collectionFilterKeyHandler = null;
 
@@ -109,7 +118,7 @@ function logo(){
   return `<a class="brand" data-link href="${rootPath('/')}">${esc(brandName(isArabic()))}${byline}</a>`;
 }
 const navLinks = () => [
-  ['/destinations',ui[lang()].nav[0]],['/collection',ui[lang()].nav[1]],['/services/private-villas',ui[lang()].nav[2]],['/services/private-aviation',ui[lang()].nav[3]],['/services/private-yachts',ui[lang()].nav[4]],['/services/experiences',ui[lang()].nav[5]],['/about',ui[lang()].nav[6]]
+  ['/destinations',ui[lang()].nav[0]],['/collection',ui[lang()].nav[1]],['/services/private-islands',ui[lang()].nav[2]],['/services/private-villas',ui[lang()].nav[3]],['/services/private-aviation',ui[lang()].nav[4]],['/services/private-yachts',ui[lang()].nav[5]],['/services/experiences',ui[lang()].nav[6]],['/about',ui[lang()].nav[7]]
 ];
 function header(){
   return `<header class="site-header" id="header"><div class="head-top"><span>${ui[lang()].division}</span><button class="lang" id="langSwitch" aria-label="${pick('Switch to Arabic','التبديل إلى الإنجليزية')}">${pick('EN | عربي','English | عربي')}</button></div><div class="header-inner container">${logo()}<nav class="nav" aria-label="${pick('Primary navigation','التنقل الرئيسي')}">${navLinks().map(([h,l])=>`<a data-link href="${rootPath(h)}">${l}</a>`).join('')}</nav><div class="head-actions"><a class="button header-cta" href="${whatsappHref()}">${ui[lang()].design}</a><button class="icon-btn menu-btn" id="menuOpen" aria-label="${pick('Open menu','فتح القائمة')}">☰</button></div></div></header>`;
@@ -146,6 +155,7 @@ function servicesOverview(){return shell(`${pageHero(pick('Travel, shaped around
 async function servicePage(s){
  const collectionDiscovery =
    s.slug === 'private-villas' ? await renderVillaDiscoverySection()
+   : s.slug === 'private-islands' ? await renderServiceCollectionSection('island')
    : s.slug === 'private-aviation' ? await renderServiceCollectionSection('jet')
    : s.slug === 'private-yachts' ? await renderServiceCollectionSection('yacht')
    : s.slug === 'experiences' ? await renderServiceCollectionSection('experience')
@@ -154,7 +164,7 @@ async function servicePage(s){
  const introSection = s.slug === 'private-villas'
    ? `<section class="editorial editorial--villas-intro"><div class="container"><div class="lead-centered"><p class="lead">${introCopy}</p></div></div></section>`
    : `<section class="editorial"><div class="container"><div class="lead-grid"><div class="eyebrow">${pick('Personally arranged','ترتيب شخصي')}</div><p class="lead">${introCopy}</p></div></div></section>`;
- return shell(`${pageHero(isArabic()?s.arTitle:s.title,isArabic()?'خدمة مصممة بعناية وفق تفاصيل رحلتكم.':s.tagline,s.image,'/services',s.slug==='private-yachts'?'page-hero--yachts':'')}${introSection}${collectionDiscovery}<section class="info-band"><div class="container info-columns"><div><h2>${pick('Enquiry types','أنواع الاستفسار')}</h2><ul class="clean-list">${s.types.map(i=>`<li>${localItem(i)}</li>`).join('')}</ul></div><div><h2>${pick('What we consider','ما نأخذه في الاعتبار')}</h2><ul class="clean-list">${s.consider.map(i=>`<li>${localItem(i)}</li>`).join('')}</ul></div><div><h2>${pick('How it works','كيف تعمل الخدمة')}</h2><ul class="clean-list"><li>${pick('Share the essential brief','شاركونا التفاصيل الأساسية')}</li><li>${pick('We assess suitable options','نقيّم الخيارات المناسبة')}</li><li>${pick('You review a clear proposal','تراجعون عرضاً واضحاً')}</li><li>${pick('Nothing is assumed until confirmed','لا يُفترض شيء قبل التأكيد')}</li></ul></div></div></section><section class="content-block"><div class="container content-grid"><div><h2>${pick('A tailored arrangement','ترتيب مفصّل لكم')}</h2><p>${pick('Your journey may begin with this service or it may support a wider itinerary. Either way, we consider timing, comfort, privacy and the transitions around it—not just the service in isolation.','قد تبدأ رحلتكم بهذه الخدمة أو تكون جزءاً من مسار أوسع. وفي الحالتين نراعي التوقيت والراحة والخصوصية والانتقالات المحيطة بها.')}</p></div><div><h2>${pick('Important to know','من المهم معرفته')}</h2><p class="notice">${s.slug==='private-aviation'?pick('Jana Travel is not an aircraft operator and does not claim an owned fleet or guaranteed availability. Options are assessed and confirmed by appropriately qualified providers.','جنى ترافل ليست مشغلاً للطائرات ولا تدّعي امتلاك أسطول أو ضمان التوافر. تُقيّم الخيارات وتؤكد عبر مزودين مؤهلين.'):s.slug==='private-yachts'?pick('Yacht inventory, crew credentials, pricing, routing and availability are supplied and confirmed by the charter provider.','تُقدم وتؤكد تفاصيل اليخت والطاقم والأسعار والمسار والتوافر من مزود خدمات التأجير.'):pick('Services and inclusions vary. Every proposed element is checked with the relevant property or supplier.','تختلف الخدمات والمزايا، ويُتحقق من كل عنصر مقترح مع المنشأة أو المورد المعني.')}</p></div></div></section>${cta(s.title)}`)}
+ return shell(`${pageHero(isArabic()?s.arTitle:s.title,isArabic()?'خدمة مصممة بعناية وفق تفاصيل رحلتكم.':s.tagline,s.image,'/services',s.slug==='private-yachts'?'page-hero--yachts':'')}${introSection}${collectionDiscovery}<section class="info-band"><div class="container info-columns"><div><h2>${pick('Enquiry types','أنواع الاستفسار')}</h2><ul class="clean-list">${s.types.map(i=>`<li>${localItem(i)}</li>`).join('')}</ul></div><div><h2>${pick('What we consider','ما نأخذه في الاعتبار')}</h2><ul class="clean-list">${s.consider.map(i=>`<li>${localItem(i)}</li>`).join('')}</ul></div><div><h2>${pick('How it works','كيف تعمل الخدمة')}</h2><ul class="clean-list"><li>${pick('Share the essential brief','شاركونا التفاصيل الأساسية')}</li><li>${pick('We assess suitable options','نقيّم الخيارات المناسبة')}</li><li>${pick('You review a clear proposal','تراجعون عرضاً واضحاً')}</li><li>${pick('Nothing is assumed until confirmed','لا يُفترض شيء قبل التأكيد')}</li></ul></div></div></section><section class="content-block"><div class="container content-grid"><div><h2>${pick('A tailored arrangement','ترتيب مفصّل لكم')}</h2><p>${pick('Your journey may begin with this service or it may support a wider itinerary. Either way, we consider timing, comfort, privacy and the transitions around it—not just the service in isolation.','قد تبدأ رحلتكم بهذه الخدمة أو تكون جزءاً من مسار أوسع. وفي الحالتين نراعي التوقيت والراحة والخصوصية والانتقالات المحيطة بها.')}</p></div><div><h2>${pick('Important to know','من المهم معرفته')}</h2><p class="notice">${s.slug==='private-aviation'?pick('Jana Travel is not an aircraft operator and does not claim an owned fleet or guaranteed availability. Options are assessed and confirmed by appropriately qualified providers.','جنى ترافل ليست مشغلاً للطائرات ولا تدّعي امتلاك أسطول أو ضمان التوافر. تُقيّم الخيارات وتؤكد عبر مزودين مؤهلين.'):s.slug==='private-yachts'?pick('Yacht inventory, crew credentials, pricing, routing and availability are supplied and confirmed by the charter provider.','تُقدم وتؤكد تفاصيل اليخت والطاقم والأسعار والمسار والتوافر من مزود خدمات التأجير.'):s.slug==='private-islands'?pick('Property facts, availability, villa configurations, exclusive-use arrangements and operating status should be revalidated with the resort before any booking proposal.','يجب إعادة التحقق من تفاصيل المنشأة والتوافر وتكوينات الفلل وترتيبات الاستخدام الحصري وحالة التشغيل مع المنتجع قبل أي عرض حجز.'):pick('Services and inclusions vary. Every proposed element is checked with the relevant property or supplier.','تختلف الخدمات والمزايا، ويُتحقق من كل عنصر مقترح مع المنشأة أو المورد المعني.')}</p></div></div></section>${cta(s.title)}`)}
 
 async function renderVillaDiscoverySection(){
  villaProperties = await getCollectionProperties();
@@ -198,6 +208,13 @@ async function renderServiceCollectionSection(kind){
    titleEn = 'Yachts to consider'; titleAr = 'يخوت للاختيار';
    emptyEn = 'Published yachts will appear here when available.';
    emptyAr = 'ستظهر اليخوت المنشورة هنا عند توافرها.';
+  } else if(kind === 'island'){
+   islandItems = await getCollectionPrivateIslands();
+   islandFilterState = createEmptyIslandFilters();
+   items = islandItems;
+   titleEn = 'Private islands to consider'; titleAr = 'جزر خاصة للاختيار';
+   emptyEn = 'Published private islands will appear here when available.';
+   emptyAr = 'ستظهر الجزر الخاصة المنشورة هنا عند توافرها.';
   } else {
    experienceItems = await getCollectionExperiences();
    items = experienceItems;
@@ -216,6 +233,10 @@ async function renderServiceCollectionSection(kind){
    titleEn = 'Yachts to consider'; titleAr = 'يخوت للاختيار';
    emptyEn = 'Published yachts will appear here when available.';
    emptyAr = 'ستظهر اليخوت المنشورة هنا عند توافرها.';
+  } else if(kind === 'island'){
+   titleEn = 'Private islands to consider'; titleAr = 'جزر خاصة للاختيار';
+   emptyEn = 'Published private islands will appear here when available.';
+   emptyAr = 'ستظهر الجزر الخاصة المنشورة هنا عند توافرها.';
   } else {
    titleEn = 'Experiences to consider'; titleAr = 'تجارب للاختيار';
    emptyEn = 'Published experiences will appear here when available.';
@@ -227,7 +248,9 @@ async function renderServiceCollectionSection(kind){
    ? renderJetFilters(getJetFilterOptions(items), jetFilterState, helpers)
    : kind === 'yacht' && items.length
      ? renderYachtFilters(getYachtFilterOptions(items), yachtFilterState, helpers)
-     : '';
+     : kind === 'island' && items.length
+       ? renderIslandFilters(getIslandFilterOptions(items), islandFilterState, helpers)
+       : '';
 
  const grid = items.length
    ? `<div class="jana-collection-grid" data-collection-grid="${kind}">${renderCollectionCardList(items, helpers, kind)}</div>
@@ -444,6 +467,7 @@ function bindVillaFilterControls(){
 
 const JET_NUMERIC_FILTERS = new Set(['passengers', 'range']);
 const YACHT_NUMERIC_FILTERS = new Set(['length', 'guests', 'cabins']);
+const ISLAND_NUMERIC_FILTERS = new Set(['bedrooms', 'guests']);
 
 function refreshJetCollection({ rebuildFilters = true, keepMenu = '' } = {}){
  refreshServiceCollection('jet', {
@@ -473,6 +497,51 @@ function refreshYachtCollection({ rebuildFilters = true, keepMenu = '' } = {}){
   rebuildFilters,
   keepMenu
  });
+}
+
+function refreshIslandCollection({ rebuildFilters = true, keepMenu = '' } = {}){
+ refreshServiceCollection('island', {
+  items: islandItems,
+  filters: islandFilterState,
+  getOptions: getIslandFilterOptions,
+  filterFn: filterIslands,
+  renderFilters: renderIslandFilters,
+  areActive: islandFiltersAreActive,
+  formatLabel: formatIslandFilterTriggerLabel,
+  createEmpty: createEmptyIslandFilters,
+  rebuildFilters,
+  keepMenu
+ });
+}
+
+function collectionFilterStateFor(kind){
+ if(kind === 'jet') return jetFilterState;
+ if(kind === 'island') return islandFilterState;
+ return yachtFilterState;
+}
+
+function setCollectionFilterState(kind, next){
+ if(kind === 'jet') jetFilterState = next;
+ else if(kind === 'island') islandFilterState = next;
+ else yachtFilterState = next;
+}
+
+function refreshCollectionByKind(kind){
+ if(kind === 'jet') refreshJetCollection();
+ else if(kind === 'island') refreshIslandCollection();
+ else refreshYachtCollection();
+}
+
+function createEmptyFiltersFor(kind){
+ if(kind === 'jet') return createEmptyJetFilters();
+ if(kind === 'island') return createEmptyIslandFilters();
+ return createEmptyYachtFilters();
+}
+
+function numericFiltersFor(kind){
+ if(kind === 'jet') return JET_NUMERIC_FILTERS;
+ if(kind === 'island') return ISLAND_NUMERIC_FILTERS;
+ return YACHT_NUMERIC_FILTERS;
 }
 
 function refreshServiceCollection(kind, cfg){
@@ -520,11 +589,9 @@ function refreshServiceCollection(kind, cfg){
    empty.innerHTML = renderCollectionFilterEmptyState(kind, helpers);
    empty.querySelectorAll('[data-filter-clear]').forEach(btn => {
     btn.addEventListener('click', () => {
-     if(kind === 'jet') jetFilterState = createEmptyJetFilters();
-     else yachtFilterState = createEmptyYachtFilters();
+     setCollectionFilterState(kind, createEmptyFiltersFor(kind));
      setCollectionFilterSheet(kind, false);
-     if(kind === 'jet') refreshJetCollection();
-     else refreshYachtCollection();
+     refreshCollectionByKind(kind);
     });
    });
   }
@@ -589,11 +656,10 @@ function bindCollectionFilterControls(kind){
  const root = document.querySelector(`[data-collection-filters="${kind}"]`);
  if(!root) return;
 
- const numericKeys = kind === 'jet' ? JET_NUMERIC_FILTERS : YACHT_NUMERIC_FILTERS;
- const refresh = () => kind === 'jet' ? refreshJetCollection() : refreshYachtCollection();
+ const numericKeys = numericFiltersFor(kind);
+ const refresh = () => refreshCollectionByKind(kind);
  const clearAll = () => {
-  if(kind === 'jet') jetFilterState = createEmptyJetFilters();
-  else yachtFilterState = createEmptyYachtFilters();
+  setCollectionFilterState(kind, createEmptyFiltersFor(kind));
   setCollectionFilterSheet(kind, false);
   refresh();
  };
@@ -617,7 +683,7 @@ function bindCollectionFilterControls(kind){
   btn.addEventListener('click', () => {
    const key = btn.getAttribute('data-filter-set');
    const raw = btn.getAttribute('data-value') ?? '';
-   const state = kind === 'jet' ? jetFilterState : yachtFilterState;
+   const state = collectionFilterStateFor(kind);
    if(numericKeys.has(key)) state[key] = raw === '' ? null : Number(raw);
    else state[key] = raw;
    refresh();
@@ -629,7 +695,7 @@ function bindCollectionFilterControls(kind){
    e.preventDefault();
    e.stopPropagation();
    const key = btn.getAttribute('data-filter-clear-one');
-   const state = kind === 'jet' ? jetFilterState : yachtFilterState;
+   const state = collectionFilterStateFor(kind);
    if(numericKeys.has(key)) state[key] = null;
    else state[key] = '';
    refresh();
@@ -664,6 +730,7 @@ function bindCollectionFilterControls(kind){
 function bindActiveCollectionFilters(){
  if(document.querySelector('[data-collection-filters="jet"]')) bindCollectionFilterControls('jet');
  if(document.querySelector('[data-collection-filters="yacht"]')) bindCollectionFilterControls('yacht');
+ if(document.querySelector('[data-collection-filters="island"]')) bindCollectionFilterControls('island');
 }
 
 function collectionOverview(){return shell(`${pageHero(pick('The Collection','المجموعة'),pick('Places we believe are worth travelling for.','أماكن نؤمن أنها تستحق السفر من أجلها.'),siteImages.property1)}<section class="editorial"><div class="container"><div class="lead-grid"><div class="eyebrow">${pick('Considered selection','اختيار مدروس')}</div><p class="lead">${pick('Four distinctive Maldivian island resorts, presented as a starting point—not an ownership claim, official partnership or guarantee of availability.','أربعة منتجعات مالديفية مميزة كنقطة بداية، دون ادعاء ملكية أو شراكة رسمية أو ضمان للتوافر.')}</p></div><div class="overview-grid" style="margin-top:70px">${properties.map(p=>card(p.title,p.line,p.image,`/collection/${p.slug}`)).join('')}</div></div></section>${cta(brandName())}`)}
@@ -691,6 +758,7 @@ async function openCollectionModal(kind, slug, triggerEl){
  let item = null;
  if(kind === 'jet') item = await getPrivateJetBySlug(slug);
  else if(kind === 'yacht') item = await getYachtBySlug(slug);
+ else if(kind === 'island') item = await getPrivateIslandBySlug(slug);
  else if(kind === 'experience') item = await getExperienceBySlug(slug);
  else if(kind === 'property') item = await getPropertyBySlug(slug);
  if(!item) return;
@@ -839,13 +907,9 @@ function bind(){
  document.querySelectorAll('[data-collection-filter-empty] [data-filter-clear]').forEach(btn => {
   btn.addEventListener('click', () => {
    const kind = btn.closest('[data-collection-filter-empty]')?.getAttribute('data-collection-filter-empty');
-   if(kind === 'jet'){
-    jetFilterState = createEmptyJetFilters();
-    refreshJetCollection();
-   } else if(kind === 'yacht'){
-    yachtFilterState = createEmptyYachtFilters();
-    refreshYachtCollection();
-   }
+   if(!kind) return;
+   setCollectionFilterState(kind, createEmptyFiltersFor(kind));
+   refreshCollectionByKind(kind);
   });
  });
 }
