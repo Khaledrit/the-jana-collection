@@ -135,18 +135,42 @@ export const yacht = defineType({
       validation: (Rule) => Rule.min(0).integer(),
     }),
     defineField({
-      name: 'marina',
-      title: 'Marina / home berth',
+      name: 'region',
+      title: 'Region / destination',
       type: 'string',
       group: 'vessel',
-      description: 'Home marina or berth location, for example Dubai Harbour.',
+      description:
+        'Broad charter region used for filtering, for example Mediterranean, Middle East, Caribbean, Northern Europe. Do not invent a region.',
+    }),
+    defineField({
+      name: 'marina',
+      title: 'Home location / marina',
+      type: 'string',
+      group: 'vessel',
+      description:
+        'Verified home marina or home base only, for example Dubai Harbour or Monaco. Leave blank when only a charter region is known.',
     }),
     defineField({
       name: 'cruisingArea',
       title: 'Cruising area',
       type: 'string',
       group: 'vessel',
-      description: 'Primary cruising region, for example Dubai coastline.',
+      description:
+        'More specific cruising notes when useful, for example Dubai coastline or Greece, Turkey. Separate from home marina.',
+    }),
+    defineField({
+      name: 'yearBuilt',
+      title: 'Year built',
+      type: 'number',
+      group: 'vessel',
+      validation: (Rule) => Rule.min(1900).max(2100).integer(),
+    }),
+    defineField({
+      name: 'yearRefit',
+      title: 'Year refit',
+      type: 'number',
+      group: 'vessel',
+      validation: (Rule) => Rule.min(1900).max(2100).integer(),
     }),
     defineField({
       name: 'startingPrice',
@@ -181,6 +205,7 @@ export const yacht = defineType({
         list: [
           {title: 'Per Hour', value: 'hour'},
           {title: 'Per Day', value: 'day'},
+          {title: 'Per Week', value: 'week'},
           {title: 'On Request', value: 'on request'},
         ],
         layout: 'dropdown',

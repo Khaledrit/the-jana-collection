@@ -25,7 +25,10 @@ export const YACHTS_QUERY = `*[_type == "yacht" && defined(slug.current)] | orde
   maxGuests,
   crew,
   marina,
+  region,
   cruisingArea,
+  yearBuilt,
+  yearRefit,
   startingPrice,
   currency,
   pricingPeriod,
@@ -96,8 +99,12 @@ export function mapSanityYacht(doc) {
     maxGuests: doc.maxGuests ?? null,
     crew: doc.crew ?? null,
     marina: doc.marina || '',
+    region: doc.region || '',
     cruisingArea: doc.cruisingArea || '',
-    locationLabel: [doc.marina, doc.cruisingArea].filter(Boolean).join(' · '),
+    yearBuilt: doc.yearBuilt ?? null,
+    yearRefit: doc.yearRefit ?? null,
+    locationLabel: formatYachtLocationLabel(doc),
+    cardLocation: formatYachtCardLocation(doc),
     startingPrice: doc.startingPrice ?? null,
     currency: doc.currency || '',
     pricingPeriod: doc.pricingPeriod || '',
@@ -113,6 +120,22 @@ export function mapSanityYacht(doc) {
   };
 }
 
+/** Card line: home marina and/or region — never invents a location. */
+function formatYachtCardLocation(doc) {
+  return [doc.marina, doc.region].filter(Boolean).join(' · ');
+}
+
+/** Modal / detail line: marina, region, then specific cruising notes when distinct. */
+function formatYachtLocationLabel(doc) {
+  const parts = [];
+  if (doc.marina) parts.push(doc.marina);
+  if (doc.region) parts.push(doc.region);
+  if (doc.cruisingArea && doc.cruisingArea !== doc.marina && doc.cruisingArea !== doc.region) {
+    parts.push(doc.cruisingArea);
+  }
+  return parts.join(' · ');
+}
+
 function formatYachtPrice(doc) {
   if (doc.pricingPeriod === 'on request' || doc.startingPrice == null || !doc.currency) {
     if (doc.pricingPeriod === 'on request' || doc.enquiryStatus === 'On Request') {
@@ -125,7 +148,10 @@ function formatYachtPrice(doc) {
     currency: doc.currency,
     maximumFractionDigits: 0
   }).format(doc.startingPrice);
-  const period = doc.pricingPeriod === 'day' ? 'day' : 'hour';
+  const period =
+    doc.pricingPeriod === 'day' ? 'day'
+    : doc.pricingPeriod === 'week' ? 'week'
+    : 'hour';
   return `From ${amount} / ${period}`;
 }
 

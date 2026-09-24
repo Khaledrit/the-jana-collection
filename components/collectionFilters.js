@@ -15,6 +15,7 @@ export function createEmptyJetFilters() {
 
 export function createEmptyYachtFilters() {
   return {
+    region: '',
     marina: '',
     yachtType: '',
     length: null,
@@ -35,7 +36,8 @@ export function jetFiltersAreActive(filters) {
 
 export function yachtFiltersAreActive(filters) {
   return Boolean(
-    filters.marina
+    filters.region
+    || filters.marina
     || filters.yachtType
     || filters.length != null
     || filters.guests != null
@@ -58,6 +60,7 @@ export function getJetFilterOptions(items) {
 }
 
 export function getYachtFilterOptions(items) {
+  const regions = uniqueSorted(items.map(item => item.region).filter(Boolean));
   const marinas = uniqueSorted(items.map(item => item.marina).filter(Boolean));
   const yachtTypes = uniqueSorted(items.map(item => item.yachtType).filter(Boolean));
   const builders = uniqueSorted(items.map(item => item.builder).filter(Boolean));
@@ -65,12 +68,13 @@ export function getYachtFilterOptions(items) {
   const maxGuests = Math.max(0, ...items.map(item => item.maxGuests || 0));
   const maxCabins = Math.max(0, ...items.map(item => item.cabins || 0));
   return {
+    regions,
     marinas,
     yachtTypes,
     builders,
-    lengthSteps: buildMinSteps(maxLength, [60, 70, 80, 100, 120, 140, 160]),
-    guestSteps: buildMinSteps(maxGuests, [10, 20, 30, 50, 80, 100]),
-    cabinSteps: buildMinSteps(maxCabins, [2, 3, 4, 5, 6])
+    lengthSteps: buildMinSteps(maxLength, [60, 70, 80, 100, 120, 140, 160, 200, 250]),
+    guestSteps: buildMinSteps(maxGuests, [8, 10, 12, 20, 30, 50, 80, 100]),
+    cabinSteps: buildMinSteps(maxCabins, [2, 3, 4, 5, 6, 8, 10, 12])
   };
 }
 
@@ -86,6 +90,7 @@ export function filterJets(items, filters) {
 
 export function filterYachts(items, filters) {
   return items.filter(item => {
+    if (filters.region && item.region !== filters.region) return false;
     if (filters.marina && item.marina !== filters.marina) return false;
     if (filters.yachtType && item.yachtType !== filters.yachtType) return false;
     if (filters.builder && item.builder !== filters.builder) return false;
@@ -132,7 +137,8 @@ export function renderYachtFilters(options, filters, { esc, pick }) {
     esc,
     pick,
     desktopControls: `
-      ${renderSelectFilter('marina', pick('Marina', 'المرسى'), options.marinas, filters.marina, pick, esc)}
+      ${renderSelectFilter('region', pick('Region', 'المنطقة'), options.regions, filters.region, pick, esc)}
+      ${renderSelectFilter('marina', pick('Home location', 'الموقع الرئيسي'), options.marinas, filters.marina, pick, esc)}
       ${renderSelectFilter('yachtType', pick('Yacht type', 'نوع اليخت'), options.yachtTypes, filters.yachtType, pick, esc)}
       ${renderSelectFilter('builder', pick('Builder', 'الصانع'), options.builders, filters.builder, pick, esc)}
       ${renderMinFilter('length', pick('Length', 'الطول'), options.lengthSteps, filters.length, pick, esc, ' ft')}
@@ -140,7 +146,8 @@ export function renderYachtFilters(options, filters, { esc, pick }) {
       ${renderMinFilter('cabins', pick('Cabins', 'الكبائن'), options.cabinSteps, filters.cabins, pick, esc)}
     `,
     sheetBody: `
-      ${renderSheetSelect('marina', pick('Marina', 'المرسى'), options.marinas, filters.marina, pick, esc)}
+      ${renderSheetSelect('region', pick('Region', 'المنطقة'), options.regions, filters.region, pick, esc)}
+      ${renderSheetSelect('marina', pick('Home location', 'الموقع الرئيسي'), options.marinas, filters.marina, pick, esc)}
       ${renderSheetSelect('yachtType', pick('Yacht type', 'نوع اليخت'), options.yachtTypes, filters.yachtType, pick, esc)}
       ${renderSheetSelect('builder', pick('Builder', 'الصانع'), options.builders, filters.builder, pick, esc)}
       ${renderSheetMin('length', pick('Length', 'الطول'), options.lengthSteps, filters.length, pick, esc, ' ft')}
@@ -175,10 +182,15 @@ export function formatJetFilterTriggerLabel(key, filters, pick) {
 }
 
 export function formatYachtFilterTriggerLabel(key, filters, pick) {
+  if (key === 'region') {
+    return filters.region
+      ? `${pick('Region', 'المنطقة')}: ${filters.region}`
+      : pick('Region', 'المنطقة');
+  }
   if (key === 'marina') {
     return filters.marina
-      ? `${pick('Marina', 'المرسى')}: ${filters.marina}`
-      : pick('Marina', 'المرسى');
+      ? `${pick('Home location', 'الموقع الرئيسي')}: ${filters.marina}`
+      : pick('Home location', 'الموقع الرئيسي');
   }
   if (key === 'yachtType') {
     return filters.yachtType
@@ -368,6 +380,7 @@ function countJetActive(filters) {
 
 function countYachtActive(filters) {
   let n = 0;
+  if (filters.region) n += 1;
   if (filters.marina) n += 1;
   if (filters.yachtType) n += 1;
   if (filters.builder) n += 1;

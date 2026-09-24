@@ -95,7 +95,8 @@ function buildStats(item, kind, pick) {
       item.maxGuests != null ? [`${item.maxGuests}`, pick('Guests', 'الضيوف')] : null,
       item.cabins != null ? [`${item.cabins}`, pick('Cabins', 'الكبائن')] : null,
       item.crew != null ? [`${item.crew}`, pick('Crew', 'الطاقم')] : null,
-      item.marina ? [item.marina, pick('Marina', 'المرسى')] : null,
+      item.marina ? [item.marina, pick('Home location', 'الموقع الرئيسي')] : null,
+      item.region ? [item.region, pick('Region', 'المنطقة')] : null,
       item.priceLabel ? [item.priceLabel, pick('Rate', 'السعر')] : null,
       item.minimumBookingLabel ? [item.minimumBookingLabel, pick('Minimum', 'الحد الأدنى')] : null
     ].filter(Boolean);

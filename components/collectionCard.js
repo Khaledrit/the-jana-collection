@@ -21,8 +21,8 @@ export function renderCollectionCard(item, { esc }, kind) {
     : isYacht
       ? ' jana-property-card--yacht'
       : '';
-  const location = isYacht && item.marina
-    ? `<p class="jana-property-card__location">${esc(item.marina)}</p>`
+  const location = isYacht && item.cardLocation
+    ? `<p class="jana-property-card__location">${esc(item.cardLocation)}</p>`
     : '';
   const price = isYacht && item.priceLabel
     ? `<p class="jana-property-card__price">${esc(item.priceLabel)}</p>`
