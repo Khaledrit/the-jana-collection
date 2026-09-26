@@ -1,6 +1,7 @@
 import type {StructureResolver} from 'sanity/structure'
 import {BoltIcon} from '@sanity/icons/Bolt'
 import {CheckmarkCircleIcon} from '@sanity/icons/CheckmarkCircle'
+import {DiamondIcon} from '@sanity/icons/Diamond'
 import {EarthGlobeIcon} from '@sanity/icons/EarthGlobe'
 import {HomeIcon} from '@sanity/icons/Home'
 import {StarIcon} from '@sanity/icons/Star'
@@ -15,6 +16,17 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title('Private Luxury Holidays CMS')
     .items([
+      S.listItem()
+        .title('Luxury Hotels')
+        .icon(DiamondIcon)
+        .child(
+          S.documentTypeList('luxuryHotel')
+            .title('Luxury Hotels')
+            .defaultOrdering([
+              {field: 'displayPriority', direction: 'asc'},
+              {field: 'name', direction: 'asc'},
+            ]),
+        ),
       S.listItem()
         .title('Private Islands')
         .icon(EarthGlobeIcon)

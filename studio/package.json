@@ -13,7 +13,9 @@
     "seed:amenities": "sanity exec scripts/seedAmenities.ts --with-user-token",
     "seed:jets": "sanity exec scripts/seedPrivateJets.ts --with-user-token",
     "seed:yachts": "sanity exec scripts/seedYachts.ts --with-user-token",
-    "seed:private-islands": "sanity exec scripts/seedPrivateIslands.ts --with-user-token"
+    "seed:private-islands": "sanity exec scripts/seedPrivateIslands.ts --with-user-token",
+    "seed:private-villas": "sanity exec scripts/seedPrivateVillas.ts --with-user-token",
+    "seed:luxury-hotels": "sanity exec scripts/seedLuxuryHotels.ts --with-user-token"
   },
   "keywords": [
     "sanity"

@@ -71,9 +71,9 @@ export const property = defineType({
       title: 'Hero image',
       type: 'image',
       group: 'media',
-      description: 'Primary image used on the residence card and property presentation.',
+      description:
+        'Primary image used on the residence card and property presentation. Optional until authorised imagery is uploaded.',
       options: {hotspot: true},
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'gallery',

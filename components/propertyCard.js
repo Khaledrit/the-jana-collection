@@ -11,10 +11,13 @@ export function renderPropertyCard(property, { esc }) {
   ].filter(Boolean).join(' · ');
 
   const place = [property.destination, property.region, property.country].filter(Boolean).join(' · ');
+  const media = property.heroImage
+    ? `<img src="${esc(property.heroImage)}" alt="${esc(property.name)}" loading="lazy" width="900" height="700">`
+    : `<div class="jana-property-card__placeholder" aria-hidden="true"><span>${esc(property.name)}</span></div>`;
 
   return `<button type="button" class="jana-property-card" data-property-slug="${esc(property.slug)}" aria-haspopup="dialog">
     <div class="jana-property-card__media">
-      <img src="${esc(property.heroImage)}" alt="${esc(property.name)}" loading="lazy" width="900" height="700">
+      ${media}
     </div>
     <div class="jana-property-card__body">
       <h3 class="jana-property-card__name">${esc(property.name)}</h3>

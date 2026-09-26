@@ -5,10 +5,13 @@ import { getCollectionPrivateJets, getPrivateJetBySlug } from './data/privateJet
 import { getCollectionYachts, getYachtBySlug } from './data/yachts.js';
 import { getCollectionPrivateIslands, getPrivateIslandBySlug } from './data/privateIslands.js';
 import { getCollectionExperiences, getExperienceBySlug } from './data/experiences.js';
+import { getCollectionLuxuryHotels, getLuxuryHotelBySlug } from './data/luxuryHotels.js';
 import { renderPropertyCardList } from './components/propertyCard.js';
 import { renderCollectionCardList } from './components/collectionCard.js';
+import { renderHotelCardList } from './components/hotelCard.js';
 import { renderPropertyModalShell, renderPropertyModalContent } from './components/propertyModal.js';
 import { renderCollectionModalContent } from './components/collectionModal.js';
+import { renderHotelModalContent } from './components/hotelModal.js';
 import {
   createEmptyFilters,
   getFilterOptions,
@@ -733,7 +736,22 @@ function bindActiveCollectionFilters(){
  if(document.querySelector('[data-collection-filters="island"]')) bindCollectionFilterControls('island');
 }
 
-function collectionOverview(){return shell(`${pageHero(pick('The Collection','المجموعة'),pick('Places we believe are worth travelling for.','أماكن نؤمن أنها تستحق السفر من أجلها.'),siteImages.property1)}<section class="editorial"><div class="container"><div class="lead-grid"><div class="eyebrow">${pick('Considered selection','اختيار مدروس')}</div><p class="lead">${pick('Four distinctive Maldivian island resorts, presented as a starting point—not an ownership claim, official partnership or guarantee of availability.','أربعة منتجعات مالديفية مميزة كنقطة بداية، دون ادعاء ملكية أو شراكة رسمية أو ضمان للتوافر.')}</p></div><div class="overview-grid" style="margin-top:70px">${properties.map(p=>card(p.title,p.line,p.image,`/collection/${p.slug}`)).join('')}</div></div></section>${cta(brandName())}`)}
+async function collectionOverview(){
+ const helpers = propertyHelpers();
+ let hotels = [];
+ try {
+  hotels = await getCollectionLuxuryHotels();
+ } catch (error) {
+  console.warn('[collection] Failed to load luxury hotels.', error);
+  hotels = [];
+ }
+
+ const grid = hotels.length
+  ? `<div class="jana-collection-grid jana-collection-grid--hotels" data-collection-grid="hotel">${renderHotelCardList(hotels, helpers)}</div>`
+  : `<div class="villa-filters__empty" data-collection-empty="hotel"><p>${pick('Published luxury hotels will appear here when available.','ستظهر الفنادق الفاخرة المنشورة هنا عند توافرها.')}</p></div>`;
+
+ return shell(`${pageHero(pick('The Collection','المجموعة'),pick('Exceptional stays. Personally selected.','إقامات استثنائية. مختارة بعناية شخصية.'),siteImages.property1)}<section class="section villa-discovery" id="hotel-discovery"><div class="container"><div class="section-title"><div class="rule-title"><h2>${pick('Luxury hotels & resorts','فنادق ومنتجعات فاخرة')}</h2></div><p>${pick('A curated selection','مجموعة مختارة بعناية')}</p></div><p class="villa-discovery__lead">${pick('Ten personally selected luxury hotels and resorts across the Maldives, Seychelles, Mauritius and Phuket. Select any card to open a fuller presentation without leaving this page. Specifications should be revalidated with the resort before final publication.','عشرة فنادق ومنتجعات فاخرة مختارة شخصياً عبر المالديف وسيشل وموريشيوس وفوكيت. اختاروا أي بطاقة لفتح عرض أوضح دون مغادرة هذه الصفحة. يُفضَّل إعادة التحقق من المواصفات مع المنتجع قبل النشر النهائي.')}</p>${grid}</div></section>${cta(brandName())}`);
+}
 function propertyPage(p){return shell(`${pageHero(p.title,p.line,p.image,'/collection')}<section class="editorial"><div class="container property-meta"><div><div class="eyebrow">${pick('The Collection','المجموعة')}</div><p class="lead">${isArabic()?'منتجع جزيرة خاص في المالديف، اختير لما يقدمه من إحساس بالمكان وإقامة مدروسة وتجارب متنوعة. تُراجع كل التفاصيل والتوافر مباشرة مع المنشأة.':p.intro}</p></div><div><h2>${pick('Location','الموقع')}</h2><p>${p.location}</p><p class="source-note">${pick(`Property facts reviewed against the official hotel website. ${BRAND.parentName} does not own or operate this property.`,`رُوجعت معلومات المنشأة وفق موقع الفندق الرسمي. ${BRAND.parentNameAr} لا تملك أو تدير هذه المنشأة.`)}</p><a class="text-link" href="${p.source}" target="_blank" rel="noopener">${pick('Official property source ↗','المصدر الرسمي للمنشأة ↗')}</a></div></div></section><section class="info-band"><div class="container info-columns"><div><h2>${pick('Accommodation','الإقامة')}</h2><p>${isArabic()?'خيارات إقامة على الشاطئ وفوق الماء، مع فئات أكبر للعائلات والمجموعات وفق ما تعرضه المنشأة رسمياً.':p.stay}</p></div><div><h2>${pick('Design & atmosphere','التصميم والأجواء')}</h2><p>${isArabic()?'أجواء جزيرية معاصرة ومساحات داخلية وخارجية صُممت للاستفادة من المشهد والخصوصية.':p.design}</p></div><div><h2>${pick('Dining & wellness','الطعام والعافية')}</h2><p>${isArabic()?'تتوافر تجارب متنوعة للطعام والعافية بحسب ما تؤكده المنشأة، وتخضع البرامج والمواعيد للتوافر.':p.dining}</p></div></div></section><section class="content-block"><div class="container content-grid"><div><h2>${pick('Experiences','التجارب')}</h2><ul>${p.experiences.map(i=>`<li>${localItem(i)}</li>`).join('')}</ul></div><div><h2>${pick('Traveller considerations','اعتبارات للمسافر')}</h2><p>${isArabic()?'يجب اختيار موقع الفيلا وفئتها وأسلوب الوصول وفق الخصوصية المطلوبة وأعمار الضيوف ووتيرة الإقامة. تُراجع التفاصيل الحالية قبل التأكيد.':p.considerations}</p><a class="button dark" href="${whatsappHref(p.title)}">${pick('Enquire about this property →','استفسروا عن هذه المنشأة ←')}</a></div></div></section><section class="editorial"><div class="container"><div class="section-title"><h2>${pick('A sense of place','إحساس بالمكان')}</h2><p>${pick('Illustrative Maldives imagery','صور توضيحية من المالديف')}</p></div><div class="gallery">${[p.image,siteImages.gallery2,siteImages.gallery3].map((i,n)=>`<img src="${i}" alt="${pick('Illustrative Maldives island view','مشهد توضيحي لجزيرة في المالديف')} ${n+1}" loading="lazy" width="900" height="650">`).join('')}</div><p class="gallery-caption">${pick('Destination imagery is illustrative and is not represented as official property photography.','صور الوجهة توضيحية ولا تُقدّم على أنها صور رسمية للمنشأة.')}</p></div></section>${cta(p.title)}`)}
 
 function about(){
@@ -761,6 +779,7 @@ async function openCollectionModal(kind, slug, triggerEl){
  else if(kind === 'island') item = await getPrivateIslandBySlug(slug);
  else if(kind === 'experience') item = await getExperienceBySlug(slug);
  else if(kind === 'property') item = await getPropertyBySlug(slug);
+ else if(kind === 'hotel') item = await getLuxuryHotelBySlug(slug);
  if(!item) return;
  openCollectionModalItem(item, kind, triggerEl);
 }
@@ -776,7 +795,9 @@ function openCollectionModalItem(item, kind, triggerEl){
  if(!modal || !content) return;
  content.innerHTML = kind === 'property'
    ? renderPropertyModalContent(item, propertyHelpers())
-   : renderCollectionModalContent(item, propertyHelpers(), kind);
+   : kind === 'hotel'
+     ? renderHotelModalContent(item, propertyHelpers())
+     : renderCollectionModalContent(item, propertyHelpers(), kind);
  modal.hidden = false;
  modal.setAttribute('aria-hidden','false');
  const scrollbar = window.innerWidth - document.documentElement.clientWidth;
@@ -810,8 +831,14 @@ function closePropertyModal({ restoreScroll = true } = {}){
 
 function setGalleryIndex(index){
  if(!modalProperty) return;
- const gallery = modalProperty.gallery?.length ? modalProperty.gallery : [modalProperty.heroImage];
+ const gallery = (modalProperty.gallery?.length
+  ? modalProperty.gallery
+  : modalProperty.heroImage
+    ? [modalProperty.heroImage]
+    : []
+ ).filter(Boolean);
  const total = gallery.length;
+ if(!total) return;
  modalGalleryIndex = (index + total) % total;
  document.querySelectorAll('[data-slide-index]').forEach(slide => {
   slide.classList.toggle('is-active', Number(slide.dataset.slideIndex) === modalGalleryIndex);
@@ -859,8 +886,8 @@ async function render(){
  else if(path.startsWith('/destinations/')) {const d=destinations.find(x=>x.slug===path.split('/')[2]);html=d?destinationPage(d):notFound()}
  else if(path==='/services') html=servicesOverview();
  else if(path.startsWith('/services/')) {const s=services.find(x=>x.slug===path.split('/')[2]);html=s?await servicePage(s):notFound()}
- else if(path==='/collection') html=collectionOverview();
- else if(path.startsWith('/collection/')) {const p=properties.find(x=>x.slug===path.split('/')[2]);html=p?propertyPage(p):notFound()}
+ else if(path==='/collection') html=await collectionOverview();
+ else if(path.startsWith('/collection/')) { navigate(rootPath('/collection')); return; }
  else if(path==='/about') html=about();
  else if(path==='/jana-standard') html=janaStandard();
  else if(path==='/design-your-journey') { window.location.replace(whatsappHref()); return; }

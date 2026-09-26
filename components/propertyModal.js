@@ -15,7 +15,12 @@ export function renderPropertyModalShell() {
 
 export function renderPropertyModalContent(property, ctx) {
   const { esc, pick, whatsappHref } = ctx;
-  const gallery = property.gallery?.length ? property.gallery : [property.heroImage];
+  const gallery = (property.gallery?.length
+    ? property.gallery
+    : property.heroImage
+      ? [property.heroImage]
+      : []
+  ).filter(Boolean);
   const place = [property.destination, property.region, property.country].filter(Boolean).join(' · ');
   const price = formatDetailPrice(property, pick);
   const stats = [
@@ -25,7 +30,8 @@ export function renderPropertyModalContent(property, ctx) {
     property.size ? [property.size, pick('Size', 'المساحة')] : null
   ].filter(Boolean);
 
-  return `
+  const galleryHtml = gallery.length
+    ? `
     <div class="property-modal__gallery" data-gallery>
       <div class="property-modal__slides">
         ${gallery.map((src, index) => `
@@ -38,7 +44,14 @@ export function renderPropertyModalContent(property, ctx) {
         <button type="button" class="property-modal__nav property-modal__nav--next" data-gallery-next aria-label="${pick('Next image', 'الصورة التالية')}">→</button>
         <div class="property-modal__count" data-gallery-count>1 / ${gallery.length}</div>
       ` : ''}
-    </div>
+    </div>`
+    : `
+    <div class="property-modal__gallery property-modal__gallery--empty" aria-hidden="true">
+      <div class="property-modal__placeholder"><span>${esc(property.name)}</span></div>
+    </div>`;
+
+  return `
+    ${galleryHtml}
 
     <div class="property-modal__body">
       <div class="eyebrow">${pick('Private residence', 'إقامة خاصة')}</div>

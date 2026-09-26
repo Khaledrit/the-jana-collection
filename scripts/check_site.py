@@ -6,10 +6,10 @@ root = Path(__file__).resolve().parent.parent
 required = [
     'index.html','styles.css','app.js','content.js','config.js','SOURCES.md','README.md','_redirects','.openai/hosting.json',
     'data/mockProperties.js','data/properties.js','data/sanityConfig.js','data/sanityClient.js','data/sanityProperties.js','data/sanityImage.js',
-    'data/collectionHelpers.js','data/privateJets.js','data/yachts.js','data/experiences.js','data/privateIslands.js',
+    'data/collectionHelpers.js','data/privateJets.js','data/yachts.js','data/experiences.js','data/privateIslands.js','data/luxuryHotels.js',
     'components/propertyCard.js','components/propertyModal.js','components/propertyFilters.js',
-    'components/collectionCard.js','components/collectionModal.js',
-    'studio/schemaTypes/privateJet.ts','studio/schemaTypes/yacht.ts','studio/schemaTypes/experience.ts','studio/schemaTypes/privateIsland.ts','studio/structure.ts'
+    'components/collectionCard.js','components/collectionModal.js','components/hotelCard.js','components/hotelModal.js',
+    'studio/schemaTypes/privateJet.ts','studio/schemaTypes/yacht.ts','studio/schemaTypes/experience.ts','studio/schemaTypes/privateIsland.ts','studio/schemaTypes/luxuryHotel.ts','studio/structure.ts'
 ]
 missing = [f for f in required if not (root/f).exists()]
 if missing:
@@ -33,11 +33,15 @@ assert 'privateIsland' in (root/'studio/schemaTypes/privateIsland.ts').read_text
 assert 'privateJet' in (root/'studio/schemaTypes/privateJet.ts').read_text()
 assert 'yacht' in (root/'studio/schemaTypes/yacht.ts').read_text()
 assert 'experience' in (root/'studio/schemaTypes/experience.ts').read_text()
+assert 'luxuryHotel' in (root/'studio/schemaTypes/luxuryHotel.ts').read_text()
 assert 'Private Islands' in (root/'studio/structure.ts').read_text()
+assert 'Luxury Hotels' in (root/'studio/structure.ts').read_text()
 assert 'Private Jets' in (root/'studio/structure.ts').read_text()
+assert 'getCollectionLuxuryHotels' in app and 'renderHotelCardList' in app
 assert 'jana-collection-grid' in (root/'styles.css').read_text()
 assert 'repeat(3,minmax(0,1fr))' in (root/'styles.css').read_text()
 assert 'data-collection-filters="island"' in (root/'styles.css').read_text()
+assert 'signature-stay' in (root/'styles.css').read_text()
 assert 'propertyModal' in app and 'renderPropertyModalShell' in app
 assert 'chalet-example' in mock and 'villa-mykonos' in mock
 assert not (root/'components/propertyDetail.js').exists(), 'propertyDetail.js should be removed (modal replaces detail pages)'
