@@ -17,6 +17,17 @@ export const structure: StructureResolver = (S) =>
     .title('Private Luxury Holidays CMS')
     .items([
       S.listItem()
+        .title('Private Villas')
+        .icon(HomeIcon)
+        .child(
+          S.documentTypeList('property')
+            .title('Private Villas')
+            .defaultOrdering([
+              {field: 'displayPriority', direction: 'asc'},
+              {field: 'name', direction: 'asc'},
+            ]),
+        ),
+      S.listItem()
         .title('Luxury Hotels')
         .icon(DiamondIcon)
         .child(
@@ -33,17 +44,6 @@ export const structure: StructureResolver = (S) =>
         .child(
           S.documentTypeList('privateIsland')
             .title('Private Islands')
-            .defaultOrdering([
-              {field: 'displayPriority', direction: 'asc'},
-              {field: 'name', direction: 'asc'},
-            ]),
-        ),
-      S.listItem()
-        .title('Private Villas')
-        .icon(HomeIcon)
-        .child(
-          S.documentTypeList('property')
-            .title('Private Villas')
             .defaultOrdering([
               {field: 'displayPriority', direction: 'asc'},
               {field: 'name', direction: 'asc'},
