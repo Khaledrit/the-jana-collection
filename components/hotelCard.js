@@ -7,10 +7,10 @@ export function renderHotelCard(hotel, { esc }) {
   const objectPosition = hotel.heroObjectPosition || '';
   const imgStyle = objectPosition ? ` style="object-position:${esc(objectPosition)}"` : '';
   const media = imageSrc
-    ? `<img src="${esc(imageSrc)}" alt="${esc(hotel.name)}" loading="lazy" width="900" height="1125"${imgStyle}>`
+    ? `<img src="${esc(imageSrc)}" alt="${esc(hotel.name)}" loading="lazy" width="1200" height="800"${imgStyle}>`
     : `<div class="jana-property-card__placeholder" aria-hidden="true"><span>${esc(hotel.name)}</span></div>`;
 
-  return `<button type="button" class="jana-property-card" data-collection-kind="hotel" data-collection-slug="${esc(hotel.slug)}" aria-haspopup="dialog">
+  return `<button type="button" class="jana-property-card jana-property-card--hotel" data-collection-kind="hotel" data-collection-slug="${esc(hotel.slug)}" aria-haspopup="dialog">
     <div class="jana-property-card__media">${media}</div>
     <div class="jana-property-card__body">
       <h3 class="jana-property-card__name">${esc(hotel.name)}</h3>

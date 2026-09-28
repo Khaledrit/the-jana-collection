@@ -2,16 +2,16 @@
  * Shared collection card — same visual system as Private Villas cards.
  * kind: jet | yacht | experience | island
  *
- * Jet and yacht cards use a wider media ratio and hotspot-aware framing;
- * islands and experiences keep 4:5.
+ * Jet, yacht and island cards use a 3:2 media ratio and hotspot-aware framing;
+ * experiences keep 4:5.
  */
 export function renderCollectionCard(item, { esc }, kind) {
   const isJet = kind === 'jet';
   const isYacht = kind === 'yacht';
   const isIsland = kind === 'island';
-  const useWideMedia = isJet || isYacht;
-  const imageSrc = useWideMedia ? (item.cardImage || item.heroImage) : (item.cardImage || item.heroImage);
-  const objectPosition = (useWideMedia || isIsland) ? (item.heroObjectPosition || 'center center') : '';
+  const useWideMedia = isJet || isYacht || isIsland;
+  const imageSrc = item.cardImage || item.heroImage;
+  const objectPosition = useWideMedia ? (item.heroObjectPosition || 'center center') : '';
   const imgStyle = objectPosition ? ` style="object-position:${esc(objectPosition)}"` : '';
   const imgSize = useWideMedia ? 'width="1200" height="800"' : 'width="900" height="1125"';
   const media = imageSrc

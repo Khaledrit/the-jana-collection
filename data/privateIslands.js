@@ -5,9 +5,9 @@ import { sanityClient } from './sanityClient.js';
 import { objectPositionFromHotspot, urlForImage } from './sanityImage.js';
 import { mapGallery, sortCollectionItems } from './collectionHelpers.js';
 
-/** Private island cards match villa portrait treatment (4:5 CDN crop). */
-const ISLAND_CARD_WIDTH = 900;
-const ISLAND_CARD_HEIGHT = 1125; // 4:5
+/** Island card media matches jets/yachts — request a 3:2 CDN crop so hotspot/crop apply. */
+const ISLAND_CARD_WIDTH = 1200;
+const ISLAND_CARD_HEIGHT = 800; // 3:2
 
 export const PRIVATE_ISLANDS_QUERY = `*[_type == "privateIsland" && defined(slug.current)] | order(coalesce(displayPriority, 9999) asc, name asc) {
   _id,

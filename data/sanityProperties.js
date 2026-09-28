@@ -3,7 +3,10 @@
  * Uses the official Sanity client (API, published perspective, no CDN).
  */
 import { sanityClient } from './sanityClient.js';
-import { urlForImage } from './sanityImage.js';
+import { objectPositionFromHotspot, urlForImage } from './sanityImage.js';
+
+const VILLA_CARD_WIDTH = 1200;
+const VILLA_CARD_HEIGHT = 800; // 3:2 — matches jet/yacht card media
 
 export const PROPERTIES_QUERY = `*[_type == "property" && defined(slug.current)] | order(coalesce(displayPriority, 9999) asc, name asc) {
   _id,
@@ -61,6 +64,9 @@ export function mapSanityProperty(doc) {
   if (!doc?.slug || !doc?.name) return null;
 
   const heroImage = urlForImage(doc.heroImage, { width: 1600, quality: 84 });
+  const cardImage = doc.heroImage
+    ? urlForImage(doc.heroImage, { width: VILLA_CARD_WIDTH, height: VILLA_CARD_HEIGHT, quality: 84 })
+    : '';
   const gallery = (doc.gallery || [])
     .map(image => urlForImage(image, { width: 1400, quality: 84 }))
     .filter(Boolean);
@@ -77,6 +83,8 @@ export function mapSanityProperty(doc) {
     name: doc.name,
     slug: doc.slug,
     heroImage: heroImage || '',
+    cardImage: cardImage || heroImage || '',
+    heroObjectPosition: objectPositionFromHotspot(doc.heroImage),
     gallery: gallery.length ? gallery : (heroImage ? [heroImage] : []),
     destination: doc.destination?.name || '',
     region: doc.destination?.region || '',

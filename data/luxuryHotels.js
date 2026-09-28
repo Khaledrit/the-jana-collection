@@ -5,8 +5,8 @@ import { sanityClient } from './sanityClient.js';
 import { objectPositionFromHotspot, urlForImage } from './sanityImage.js';
 import { mapGallery, sortCollectionItems } from './collectionHelpers.js';
 
-const HOTEL_CARD_WIDTH = 900;
-const HOTEL_CARD_HEIGHT = 1125; // 4:5 — matches villa card media
+const HOTEL_CARD_WIDTH = 1200;
+const HOTEL_CARD_HEIGHT = 800; // 3:2 — matches jet/yacht card media
 
 export const LUXURY_HOTELS_QUERY = `*[_type == "luxuryHotel" && defined(slug.current)] | order(coalesce(displayPriority, 9999) asc, name asc) {
   _id,
